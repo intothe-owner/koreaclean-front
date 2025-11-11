@@ -1,4 +1,5 @@
 // BulkSeniorUploadModal.tsx (프리뷰 테이블 부분만 변경, 전체 컴포넌트 붙여써도 OK)
+import { fetchWithAuth } from "@/lib/fetchWitgAuth";
 import React, { ChangeEvent, DragEvent, useCallback, useMemo, useState } from "react";
 import Swal from "sweetalert2";
 
@@ -47,7 +48,7 @@ export function BulkSeniorUploadModal({
         try {
             const fd = new FormData();
             files.forEach((f) => fd.append("file", f));
-            const res = await fetch(parseEndpoint, { method: "POST", body: fd });
+            const res = await fetchWithAuth(parseEndpoint, { method: "POST", body: fd });
             const json = await res.json();
             if (!res.ok || !json?.is_success) throw new Error(json?.message || "업로드/파싱 실패");
             setItems(json.items as EnrichedItem[]);
@@ -61,7 +62,7 @@ export function BulkSeniorUploadModal({
         if (!items?.length) return;
         setErr(null); setLoading(true);
         try {
-            const res = await fetch(geocodeEndpoint, {
+            const res = await fetchWithAuth(geocodeEndpoint, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ items }),
@@ -105,7 +106,7 @@ export function BulkSeniorUploadModal({
         setSubmitting(true);
         setErr(null);
         try {
-            const res = await fetch(saveEndpoint, {
+            const res = await fetchWithAuth(saveEndpoint, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ items: target }),

@@ -9,6 +9,7 @@ import { useCompanies } from "@/hooks/useCompanies";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import AssRegionMultiSelect from "../ui/AssRegionMultiSelect";
 import EstimateViewer from "./EstimateViewer";
+import { fetchWithAuth } from "@/lib/fetchWitgAuth";
 
 type Props = {
   open: boolean;
@@ -66,7 +67,7 @@ function useAssignCompany() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ requestId, companyId }: { requestId: number; companyId: number }) => {
-      const res = await fetch(`/backend/request/${requestId}/assign`, {
+      const res = await fetchWithAuth(`/backend/request/${requestId}/assign`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -719,7 +720,7 @@ async function downloadFile(f: FileLike) {
   const href = toAbsoluteUrl(f.url || f.path || "");
   if (!href) return;
 
-  const res = await fetch(href, { credentials: "include" });
+  const res = await fetchWithAuth(href, { credentials: "include" });
   if (!res.ok) {
     alert("파일 다운로드에 실패했습니다.");
     return;

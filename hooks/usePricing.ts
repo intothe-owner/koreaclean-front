@@ -1,6 +1,7 @@
 // hooks/usePricing.ts
 "use client";
 
+import { fetchWithAuth } from "@/lib/fetchWitgAuth";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 export type RowKey = "totalCare" | "generalCleaning" | "disinfection" | "acDeepClean" | "etc";
@@ -48,7 +49,7 @@ export function usePricing(options?: {
       setLoading(true);
       setError(null);
 
-      const res = await fetch(fetchUrl, {
+      const res = await fetchWithAuth(fetchUrl, {
         method: "GET",
         credentials: "include",
       });
@@ -90,7 +91,7 @@ export function usePricing(options?: {
         }
       }
 
-      const res = await fetch(saveUrl, {
+      const res = await fetchWithAuth(saveUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

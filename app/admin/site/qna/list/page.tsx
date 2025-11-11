@@ -2,6 +2,7 @@
 
 import Header from "@/components/admin/Header";
 import Sidebar from "@/components/admin/Siderbar";
+import { fetchWithAuth } from "@/lib/fetchWitgAuth";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
@@ -81,7 +82,7 @@ export default function QnaListPage() {
       if (status) qs.set("status", status);
       if (category) qs.set("category", category);
 
-      const res = await fetch(`/backend/qna/admin/list?${qs.toString()}`, {
+      const res = await fetchWithAuth(`/backend/qna/admin/list?${qs.toString()}`, {
         method: "GET",
 
         credentials: "include",

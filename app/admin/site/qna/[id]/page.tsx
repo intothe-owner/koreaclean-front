@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { fetchWithAuth } from "@/lib/fetchWitgAuth";
+import { baseUrl } from "@/lib/variable";
 
 type QnaStatus = "NEW" | "ANSWERED" | "REOPENED" | "CLOSED";
 type QnaCategory = "서비스 신청" | "변경" | "취소" | "불만사항" | "제안";
@@ -129,7 +130,7 @@ export default function AdminQnaDetailPage() {
         if (!newComment.trim() || !item) return;
         try {
             setPosting(true);
-            const res = await fetch("/backend/qna/comment", {
+            const res = await fetchWithAuth(`${baseUrl}/qna/comment`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -154,7 +155,7 @@ export default function AdminQnaDetailPage() {
         try {
             setActing(true);
             const url = closed ? "/backend/qna/close" : "/backend/qna/reopen";
-            const res = await fetch(url, {
+            const res = await fetchWithAuth(url, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -180,7 +181,7 @@ export default function AdminQnaDetailPage() {
         if (!confirm("이 댓글을 삭제하시겠습니까?")) return;
         try {
             setDeletingId(id);
-            const res = await fetch(`/backend/qna/comment/${id}`, {
+            const res = await fetchWithAuth(`/backend/qna/comment/${id}`, {
                 method: "DELETE",
                
                 credentials: "include",

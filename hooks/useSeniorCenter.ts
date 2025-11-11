@@ -28,7 +28,7 @@ async function fetchSeniorCenters(): Promise<SeniorCenterRow[]> {
 }
 
 async function deleteSeniorCenter(id: number) {
-  const res = await fetch(`/backend/senior/${id}`, {
+  const res = await fetchWithAuth(`/backend/senior/${id}`, {
     method: 'DELETE',
     credentials: 'include',
   });

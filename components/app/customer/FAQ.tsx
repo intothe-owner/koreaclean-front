@@ -1,6 +1,8 @@
 // components/app/customer/FAQ.tsx
 "use client";
 
+import { fetchWithAuth } from "@/lib/fetchWitgAuth";
+import { baseUrl } from "@/lib/variable";
 import { useEffect, useId, useMemo, useState } from "react";
 
 /* ---------- 고정 카테고리 ---------- */
@@ -42,7 +44,7 @@ export default function FAQ() {
       try {
         const params = new URLSearchParams({ is_active: "1" });
         if (cat !== ALL) params.set("category", cat);
-        const res = await fetch(`${API_BASE}/faqs?${params.toString()}`, { method: "GET" });
+        const res = await fetchWithAuth(`${baseUrl}/faqs?${params.toString()}`, { method: "GET" });
         const json = await res.json();
         if (!alive) return;
 

@@ -10,6 +10,7 @@ import Swal from 'sweetalert2';
 import { useRouter } from 'next/navigation';
 import { useSiteInfo } from '@/hooks/useSiteInfo'; // ✅ 추가
 import { useSession } from 'next-auth/react';
+import { fetchWithAuth } from '@/lib/fetchWitgAuth';
 
 type MemberRole = 'ADMIN' | 'CLIENT' | 'COMPANY';
 
@@ -64,7 +65,7 @@ export default function SignUpPage() {
   const [agreePrivacy, setAgreePrivacy] = useState(false);
 
   const emailCheck = async (email: string) => {
-    const res = await fetch(`${baseUrl}/users/check?email=${email}`, {
+    const res = await fetchWithAuth(`${baseUrl}/users/check?email=${email}`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
     });
@@ -150,7 +151,7 @@ export default function SignUpPage() {
     }
 
     try {
-      const res = await fetch(`${baseUrl}/users/save`, {
+      const res = await fetchWithAuth(`${baseUrl}/users/save`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

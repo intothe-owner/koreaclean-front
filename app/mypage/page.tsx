@@ -93,7 +93,7 @@ export default function MyPage() {
     enabled: !!session?.user?.email && isCompany,
     queryFn: async (): Promise<ApproveAPI> => {
       const url = `${baseUrl}/users/approv?email=${encodeURIComponent(session?.user!.email!)}&onlyApproved=1`;
-      const res = await fetch(url, { credentials: 'include' });
+      const res = await fetchWithAuth(url, { credentials: 'include' });
       if (!res.ok && res.status !== 404) throw new Error('NETWORK_ERROR');
       return res.json();
     },

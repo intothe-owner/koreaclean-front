@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import InquiryDetailModal from "./InquiryDetailModal";
+import { fetchWithAuth } from "@/lib/fetchWitgAuth";
 type InquiryRow = {
   id: number;
   title: string;
@@ -60,7 +61,7 @@ export function CompanyInquiryListModal({
       sp.set('company_id', String(companyId));
 
       const url = `/backend/inquiry/list?${sp.toString()}`;
-      const res = await fetch(url, {
+      const res = await fetchWithAuth(url, {
         credentials: 'include',
         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       });

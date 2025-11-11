@@ -2,6 +2,7 @@
 import type { NextAuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { baseUrl } from "./variable";
+import { fetchWithAuth } from "./fetchWitgAuth";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -12,7 +13,7 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
 
 
-        const res = await fetch(`${baseUrl}/users/login`, {
+        const res = await fetchWithAuth(`${baseUrl}/users/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",

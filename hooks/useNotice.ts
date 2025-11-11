@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation, UseMutationResult, UseQueryResult } from "@tanstack/react-query";
+import { fetchWithAuth } from "@/lib/fetchWitgAuth";
 
 /* ================== 타입/상수 ================== */
 export type PriorityCode = "EMERGENCY" | "IMPORTANT" | "NORMAL";
@@ -62,7 +63,7 @@ const required = (v?: string) => (v ?? "").trim().length > 0;
 
 /* ================== API 함수 ================== */
 export async function fetchNoticeDetail(id: string | number): Promise<DetailResponse> {
-  const res = await fetch(`/backend/notice/detail?id=${id}`, { credentials: "include" });
+  const res = await fetchWithAuth(`/backend/notice/detail?id=${id}`, { credentials: "include" });
   if (!res.ok) throw new Error("상세를 불러오지 못했습니다.");
   return res.json();
 }
@@ -83,7 +84,7 @@ export async function fetchNoticeList(params: {
   sp.set("order_by", params.order_by ?? "createdAt");
   sp.set("order_dir", params.order_dir ?? "DESC");
 
-  const res = await fetch(`/backend/notice/list?${sp.toString()}`, { credentials: "include" });
+  const res = await fetchWithAuth(`/backend/notice/list?${sp.toString()}`, { credentials: "include" });
   if (!res.ok) throw new Error("목록을 불러오지 못했습니다.");
   return res.json();
 }
@@ -104,7 +105,7 @@ export async function saveNotice(payload: {
   }
   files.forEach((f) => fd.append("files", f));
 
-  const res = await fetch(`/backend/notice/save`, {
+  const res = await fetchWithAuth(`/backend/notice/save`, {
     method: "POST",
     credentials: "include",
     body: fd,
@@ -114,7 +115,7 @@ export async function saveNotice(payload: {
 }
 
 export async function deleteNotice(id: string | number): Promise<DeleteResponse> {
-  const res = await fetch(`/backend/notice/delete?id=${id}`, {
+  const res = await fetchWithAuth(`/backend/notice/delete?id=${id}`, {
     method: "POST",
     credentials: "include",
   });

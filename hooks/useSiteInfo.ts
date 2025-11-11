@@ -1,9 +1,10 @@
 // hooks/useSiteInfo.ts
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { SiteInfoDto } from "@/lib/variable"; 
+import { fetchWithAuth } from "@/lib/fetchWitgAuth";
 
 async function fetchSiteInfo(): Promise<SiteInfoDto> {
-  const res = await fetch("/backend/site/detail", { cache: "no-store" });
+  const res = await fetchWithAuth("/backend/site/detail", { cache: "no-store" });
   const data = await res.json();
   if (!res.ok || data?.is_success === false) {
     throw new Error(data?.message || "사이트 정보 조회 실패");
@@ -25,7 +26,7 @@ export function useSaveSiteInfo() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (fd: FormData) => {
-      const res = await fetch("/backend/site/save", { method: "POST", body: fd });
+      const res = await fetchWithAuth("/backend/site/save", { method: "POST", body: fd });
       const data = await res.json();
       if (!res.ok || data?.is_success === false) {
         throw new Error(data?.message || "저장 실패");

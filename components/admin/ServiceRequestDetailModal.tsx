@@ -576,7 +576,7 @@ async function downloadFile(f: FileLike) {
   const href = toAbsoluteUrl(f.url || f.path || "");
   if (!href) return;
 
-  const res = await fetch(href, { credentials: "include" });
+  const res = await fetchWithAuth(href, { credentials: "include" });
   if (!res.ok) {
     alert("파일 다운로드에 실패했습니다.");
     return;

@@ -1,6 +1,7 @@
 // src/hooks/useReviews.ts
 'use client';
 
+import { fetchWithAuth } from '@/lib/fetchWitgAuth';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 export type ReviewStatus = 'PUBLISHED' | 'HIDDEN' | 'PENDING';
@@ -54,7 +55,7 @@ function toQS(params: ReviewQueryParams = {}) {
 /** 목록 가져오기 fetcher */
 async function fetchReviews(params: ReviewQueryParams = {}): Promise<ReviewListResponse> {
   const qs = toQS(params);
-  const res = await fetch(`/backend/reviews?${qs}`, {
+  const res = await fetchWithAuth(`/backend/reviews?${qs}`, {
     method: 'GET',
     credentials: 'include', // 세션/쿠키 인증 사용 시
   });
@@ -67,7 +68,7 @@ async function fetchReviews(params: ReviewQueryParams = {}): Promise<ReviewListR
 
 /** 후기 삭제 (soft 기본 / force=1 이면 하드 삭제) */
 async function deleteReview(id: number | string, force = false) {
-  const res = await fetch(`/backend/reviews/${id}?force=${force ? 1 : 0}`, {
+  const res = await fetchWithAuth(`/backend/reviews/${id}?force=${force ? 1 : 0}`, {
     method: 'DELETE',
     credentials: 'include',
   });
@@ -80,7 +81,7 @@ async function deleteReview(id: number | string, force = false) {
 
 /** 후기 상태/내용 수정 */
 async function updateReview(id: number | string, patch: Partial<Pick<ReviewDTO, 'title' | 'content' | 'rating' | 'status'>>) {
-  const res = await fetch(`/backend/reviews/${id}`, {
+  const res = await fetchWithAuth(`/backend/reviews/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',

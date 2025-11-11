@@ -1,6 +1,7 @@
 // hooks/useMainBanners.ts
 "use client";
 
+import { fetchWithAuth } from "@/lib/fetchWitgAuth";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 /** 애니메이션 옵션 타입 */
@@ -137,7 +138,7 @@ export function useMainBanners({ apiList, apiSave, defaultFont }: UseMainBanners
   const reload = useCallback(async () => {
     try {
       setFetching(true);
-      const res = await fetch(`${apiList}?onlyActive=0&limit=200&offset=0&order=asc`);
+      const res = await fetchWithAuth(`${apiList}?onlyActive=0&limit=200&offset=0&order=asc`);
       const json = await res.json();
       if (!res.ok || json?.is_success === false) throw new Error(json?.message || "목록 조회 실패");
 
@@ -172,7 +173,7 @@ export function useMainBanners({ apiList, apiSave, defaultFont }: UseMainBanners
     try {
       setSaving(true);
       const payload = { slides: items };
-      const res = await fetch(apiSave, {
+      const res = await fetchWithAuth(apiSave, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

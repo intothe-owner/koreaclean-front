@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import Swal from "sweetalert2";
 import DaumPostcodeFinder from "../ui/DaumPostcodeFinder";
 import { useSession } from "next-auth/react";
+import { fetchWithAuth } from "@/lib/fetchWitgAuth";
 // import { SeniorItem } from "@/lib/variable"; // 실제 타입이 있으면 이 라인을 사용하세요.
 
 
@@ -190,7 +191,7 @@ function SeniorRegisterModal({
 
         onAdd(item);
         try {
-            const res = await fetch(`/backend/senior/save`, {
+            const res = await fetchWithAuth(`/backend/senior/save`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(item),

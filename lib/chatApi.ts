@@ -1,3 +1,5 @@
+import { fetchWithAuth } from "./fetchWitgAuth";
+
 // lib/backend/chatApi.ts
 export type ChatMessageDTO = {
   id: number;
@@ -39,7 +41,7 @@ export async function listThreads(opts?: {
   if (opts?.page_size) qs.set("page_size", String(opts.page_size));
   if (opts?.status) qs.set("status", opts.status);
   if (opts?.q) qs.set("q", opts.q);
-  const res = await fetch(`/backend/chat/threads?${qs.toString()}`, {
+  const res = await fetchWithAuth(`/backend/chat/threads?${qs.toString()}`, {
     credentials: opts?.credentials ?? "include",
   });
   if (!res.ok) throw new Error("Failed to list threads");
@@ -47,7 +49,7 @@ export async function listThreads(opts?: {
 }
 
 export async function getThread(threadId: number, credentials: RequestCredentials = "include") {
-  const res = await fetch(`/backend/chat/threads/${threadId}`, { credentials });
+  const res = await fetchWithAuth(`/backend/chat/threads/${threadId}`, { credentials });
   if (!res.ok) throw new Error("Failed to get thread");
   return res.json() as Promise<{ item: any; myRead?: any }>;
 }
@@ -63,7 +65,7 @@ export async function getMessages(
   if (params?.before_id) qs.set("before_id", String(params.before_id));
   if (params?.after_id) qs.set("after_id", String(params.after_id));
   if (params?.order_dir) qs.set("order_dir", params.order_dir);
-  const res = await fetch(`/backend/chat/threads/${threadId}/messages?${qs.toString()}`, { credentials });
+  const res = await fetchWithAuth(`/backend/chat/threads/${threadId}/messages?${qs.toString()}`, { credentials });
   if (!res.ok) throw new Error("Failed to list messages");
   return res.json() as Promise<{ items: ChatMessageDTO[]; total: number; total_pages: number; page: number }>;
 }
@@ -73,7 +75,7 @@ export async function sendMessageAPI(
   body: { type?: string; content?: string | null; attachments?: any },
   credentials: RequestCredentials = "include"
 ) {
-  const res = await fetch(`/backend/chat/threads/${threadId}/messages`, {
+  const res = await fetchWithAuth(`/backend/chat/threads/${threadId}/messages`, {
     method: "POST",
     credentials,
     headers: { "Content-Type": "application/json" },
@@ -89,7 +91,7 @@ export async function markReadAPI(
   perMessage = false,
   credentials: RequestCredentials = "include"
 ) {
-  const res = await fetch(`/backend/chat/threads/${threadId}/read`, {
+  const res = await fetchWithAuth(`/backend/chat/threads/${threadId}/read`, {
     method: "POST",
     credentials,
     headers: { "Content-Type": "application/json" },
@@ -104,7 +106,7 @@ export async function resolveThreadByRequest(
   company_id?: number | null,
   credentials: RequestCredentials = 'include'
 ) {
-  const res = await fetch(`/backend/chat/threads/resolve`, {
+  const res = await fetchWithAuth(`/backend/chat/threads/resolve`, {
     method: 'POST',
     credentials,
     headers: { 'Content-Type': 'application/json' },

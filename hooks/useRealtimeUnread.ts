@@ -4,6 +4,7 @@
 import { useEffect, useMemo } from "react";
 import { create } from "zustand";
 import { io, Socket } from "socket.io-client";
+import { fetchWithAuth } from "@/lib/fetchWitgAuth";
 
 type CountsState = {
   counts: Record<number, number>; // room_id -> unread_count
@@ -89,7 +90,7 @@ export function useRealtimeUnread(meId?: number | null) {
     try {
       await Promise.all(
         unique.map(async (rid) => {
-          const res = await fetch(`/backend/chat/rooms/open`, {
+          const res = await fetchWithAuth(`/backend/chat/rooms/open`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
@@ -115,7 +116,7 @@ export function useRealtimeUnread(meId?: number | null) {
   async function markRead(roomId: number) {
     if (!roomId) return;
     try {
-      const res = await fetch(`/backend/chat/rooms/${roomId}/read`, {
+      const res = await fetchWithAuth(`/backend/chat/rooms/${roomId}/read`, {
         method: "POST",
         credentials: "include",
       });

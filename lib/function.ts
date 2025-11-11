@@ -1,3 +1,4 @@
+import { fetchWithAuth } from "./fetchWitgAuth";
 import { baseUrl } from "./variable";
 
 
@@ -89,7 +90,7 @@ export function getSeniorRows(input: any): Array<{ id?: number; name: string; ad
 export async function getSiteInfoServer() {
   // 절대경로나 내부 API 호출 대신, DB直 또는 내부 함수 호출을 추천
   // 여기서는 서버에서 API 호출 예시(동일 호스트 기준)
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ""}/backend/site/detail`, {
+  const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_BASE_URL || ""}/backend/site/detail`, {
     cache: "no-store",
   });
   const data = await res.json();
@@ -120,7 +121,7 @@ export async function fetchSiteInfoForMeta() {
   // 절대 URL 확보
   const base = "http://localhost:4500";
 
-  const res = await fetch(`${base}/site/detail`, {
+  const res = await fetchWithAuth(`${base}/site/detail`, {
     cache: "no-store", // 항상 최신 (원하면 revalidate로 바꿔도 됨)
   });
   if (!res.ok) return null;

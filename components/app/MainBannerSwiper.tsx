@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, A11y } from "swiper/modules";
 import "swiper/css";
+import { fetchWithAuth } from "@/lib/fetchWitgAuth";
 
 export type AnimValue =
   | "none"
@@ -99,7 +100,7 @@ export default function MainBannerSwiper({
       if (!src || items) return;
       try {
         setLoading(true);
-        const res = await fetch(src, { method: "GET", cache: "no-store" });
+        const res = await fetchWithAuth(src, { method: "GET", cache: "no-store" });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
 

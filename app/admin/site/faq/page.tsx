@@ -4,6 +4,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Header from "@/components/admin/Header";
 import Sidebar from "@/components/admin/Siderbar";
+import { fetchWithAuth } from "@/lib/fetchWitgAuth";
 
 
 /* ---------- 고정 카테고리 ---------- */
@@ -86,7 +87,7 @@ export default function FaqPage() {
       if (q.trim()) params.set("q", q.trim());
       if (cat) params.set("category", cat);
 
-      const res = await fetch(`${API_BASE}/faqs?${params.toString()}`, { method: "GET" });
+      const res = await fetchWithAuth(`${API_BASE}/faqs?${params.toString()}`, { method: "GET" });
       const json = await res.json();
       if (json?.is_success) {
         setItems(json.items || []);
@@ -108,7 +109,7 @@ export default function FaqPage() {
     setDeletingId(item.id);
     try {
       const url = `${API_BASE}/faqs/${item.id}${opts?.hard ? "?force=1" : ""}`;
-      const res = await fetch(url, { method: "DELETE" });
+      const res = await fetchWithAuth(url, { method: "DELETE" });
       const json = await res.json().catch(() => ({}));
       if (res.ok && (json?.is_success !== false)) {
         // 낙관적 업데이트
@@ -454,7 +455,7 @@ function FaqModal({
             : Number(form.order_no),
       };
 
-      const res = await fetch(`/api/faq/save`, {
+      const res = await fetchWithAuth(`/api/faq/save`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

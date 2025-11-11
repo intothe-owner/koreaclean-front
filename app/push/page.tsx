@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { issueFcmToken, listenForeground } from '@/src/lib/fcm';
+import { fetchWithAuth } from '@/lib/fetchWitgAuth';
 
 export default function PushPage() {
   const [status, setStatus] = useState<'idle'|'requesting'|'granted'|'denied'|'default'|'unsupported'|'error'>('idle');
@@ -23,7 +24,7 @@ export default function PushPage() {
         setStatus('granted');
 
         // 서버에 토큰 등록
-        const res = await fetch('/backend/push/register', {
+        const res = await fetchWithAuth('/backend/push/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ token }),

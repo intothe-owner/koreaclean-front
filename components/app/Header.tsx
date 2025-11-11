@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { HiOutlineMenu, HiOutlineX, HiChevronDown } from 'react-icons/hi';
 import { useSession, signOut } from 'next-auth/react';
+import { fetchWithAuth } from '@/lib/fetchWitgAuth';
 
 export default function Header() {
   const router = useRouter();
@@ -29,7 +30,7 @@ export default function Header() {
   const handleLogout = async () => {
     // (선택) 백엔드 쿠키 로그아웃도 함께 처리하고 싶다면 주석 해제
     try {
-      await fetch('/backend/users/logout', { method: 'POST', credentials: 'include' });
+      await fetchWithAuth('/backend/users/logout', { method: 'POST', credentials: 'include' });
     } catch (_) { /* noop */ }
 
     // NextAuth 세션 종료

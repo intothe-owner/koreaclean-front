@@ -7,6 +7,7 @@ import Footer from "@/components/app/Footer";
 import MainBannerSwiper from "@/components/app/MainBannerSwiper";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import { fetchWithAuth } from "@/lib/fetchWitgAuth";
 
 /* ===== 타입 ===== */
 type PriorityCode = "EMERGENCY" | "IMPORTANT" | "NORMAL";
@@ -68,7 +69,7 @@ export default function PublicNoticeDetailPage() {
     (async () => {
       try {
         setLoading(true);
-        const res = await fetch(`/backend/notice/detail?id=${id}&inc_view=1`, { credentials: "include" });
+        const res = await fetchWithAuth(`/backend/notice/detail?id=${id}&inc_view=1`, { credentials: "include" });
         if (!res.ok) throw new Error("상세를 불러오지 못했습니다.");
         const json = (await res.json()) as DetailResponse;
         if (!alive) return;

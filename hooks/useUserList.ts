@@ -1,6 +1,7 @@
 // hooks/useUserList.ts
 "use client";
 
+import { fetchWithAuth } from "@/lib/fetchWitgAuth";
 import { useQuery, keepPreviousData } from "@tanstack/react-query"; // ⬅️ 헬퍼 임포트 추가
 
 export type Role = "SUPER" | "ADMIN" | "CLIENT" | "COMPANY";
@@ -58,7 +59,7 @@ async function fetchUserList(params: UserListParams): Promise<UserListResponse> 
       url.searchParams.set(k, String(v));
     }
   });
-  const res = await fetch(url.toString(), {
+  const res = await fetchWithAuth(url.toString(), {
     method: "GET",
     credentials: "include", // 쿠키(엑세스 토큰) 사용
     headers: { "Content-Type": "application/json" },

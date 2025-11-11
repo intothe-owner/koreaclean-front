@@ -6,6 +6,7 @@ import Sidebar from "@/components/admin/Siderbar";
 import DaumPostcodeFinder from "@/components/ui/DaumPostcodeFinder";
 
 import { useSiteInfo } from "@/hooks/useSiteInfo";
+import { fetchWithAuth } from "@/lib/fetchWitgAuth";
 import { formatBizNo, formContact } from "@/lib/function";
 import { baseUrl } from "@/lib/variable";
 import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from "react";
@@ -236,7 +237,7 @@ function SiteBasicInfoForm() {
       fd.append("terms_text", form.terms_text);
       fd.append("privacy_text", form.privacy_text);
 
-      const res = await fetch("/backend/site/save", { method: "POST", body: fd });
+      const res = await fetchWithAuth(`${baseUrl}/site/save`, { method: "POST", body: fd });
       const payload = await res.json().catch(() => ({}));
       if (!res.ok || payload?.is_success === false) {
         throw new Error(payload?.message || "저장 중 오류가 발생했습니다.");

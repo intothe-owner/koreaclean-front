@@ -1,5 +1,6 @@
 "use client";
 
+import { fetchWithAuth } from "@/lib/fetchWitgAuth";
 import { useEffect, useState } from "react";
 
 type RowKey = "totalCare" | "generalCleaning" | "disinfection" | "acDeepClean" | "etc";
@@ -74,7 +75,7 @@ export default function PricingPublic({
       try {
         setLoading(true);
         setErr(null);
-        const res = await fetch(fetchUrl, { credentials: "include" });
+        const res = await fetchWithAuth(fetchUrl, { credentials: "include" });
         const json = await res.json();
         if (!res.ok || !json?.is_success) throw new Error(json?.message || "요금표 조회 실패");
         const pricing = json?.pricing || {};

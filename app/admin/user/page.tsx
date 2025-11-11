@@ -8,6 +8,7 @@ import { useUserList, type Role, type UserRow, type SearchKey } from "@/hooks/us
 import { useDebounce } from "@/hooks/useDebounce"; // 선택사항: ②를 만든 경우
 import EmailComposerModal, { EmailMode } from "@/components/admin/EmailComposerModal";
 import UserDetailModal from "@/components/admin/UserDetailModal";
+import { fetchWithAuth } from "@/lib/fetchWitgAuth";
 const ROLE_LABEL: Record<Role, string> = {
     SUPER: "슈퍼",
     ADMIN: "관리자",
@@ -145,7 +146,7 @@ export default function UserPage() {
         filter?: { q?: string; key?: "email" | "name" | "phone"; role?: string | "" };
         ids?: number[];
     }) {
-        const res = await fetch("/backend/users/send-email", {
+        const res = await fetchWithAuth("/backend/users/send-email", {
             method: "POST",
             credentials: "include",
             headers: { "Content-Type": "application/json" },
@@ -225,7 +226,7 @@ export default function UserPage() {
         const verb = next ? "복구" : "탈퇴";
         if (!confirm(`정말 ${verb} 처리할까요?\n\n이메일: ${user.email}`)) return;
 
-        const res = await fetch(`/backend/users/use/${user.id}`, {
+        const res = await fetchWithAuth(`/backend/users/use/${user.id}`, {
             method: "PATCH",
             credentials: "include",
             headers: { "Content-Type": "application/json" },

@@ -3,6 +3,7 @@
 import { ReactNode, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { SiteInfoDto } from "@/lib/variable"; 
+import { fetchWithAuth } from "@/lib/fetchWitgAuth";
 
 export default function SiteInfoProvider({ children }: { children: ReactNode }) {
   const qc = useQueryClient();
@@ -11,7 +12,7 @@ export default function SiteInfoProvider({ children }: { children: ReactNode }) 
     qc.prefetchQuery({
       queryKey: ["siteInfo"],
       queryFn: async () => {
-        const res = await fetch("/backend/site/detail", { cache: "no-store" });
+        const res = await fetchWithAuth("/backend/site/detail", { cache: "no-store" });
         const data = await res.json();
         return (data?.item || null) as SiteInfoDto | null;
       },

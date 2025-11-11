@@ -121,7 +121,7 @@ export default function QnaDetailPage() {
     if (!newComment.trim()) return;
     try {
       setPosting(true);
-      const res = await fetch('/backend/qna/comment', {
+      const res = await fetchWithAuth('/backend/qna/comment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -153,7 +153,7 @@ export default function QnaDetailPage() {
     if (!confirm('이 문의를 종결하시겠습니까?')) return;
     try {
       setActing(true);
-      const res = await fetch('/backend/qna/close', {
+      const res = await fetchWithAuth('/backend/qna/close', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -177,7 +177,7 @@ export default function QnaDetailPage() {
     if (!item) return;
     try {
       setActing(true);
-      const res = await fetch('/backend/qna/reopen', {
+      const res = await fetchWithAuth('/backend/qna/reopen', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -202,7 +202,7 @@ export default function QnaDetailPage() {
     if (!confirm("이 댓글을 삭제하시겠습니까?")) return;
     try {
       setDeletingId(id);
-      const res = await fetch(`/backend/qna/comment/${id}`, {
+      const res = await fetchWithAuth(`/backend/qna/comment/${id}`, {
         method: "DELETE",
         
         credentials: "include",
