@@ -58,11 +58,11 @@ const nextConfig: NextConfig = {
     if (!backend) return [];
 
     return [
-      { source: "/backend/:path*", destination: `${backend}/:path*` },
+      { source: "/backend/:path*", destination: `http://3.36.49.217/:path*` },
       // Socket.IO(개발용) – 운영은 Nginx에서 처리 권장
-      { source: "/socket.io", destination: `${backend}/socket.io` },
-      { source: "/socket.io/", destination: `${backend}/socket.io/` },
-      { source: "/socket.io/:path*", destination: `${backend}/socket.io/:path*` },
+      { source: "/socket.io", destination: `http://3.36.49.217/socket.io` },
+      { source: "/socket.io/", destination: `http://3.36.49.217/socket.io/` },
+      { source: "/socket.io/:path*", destination: `http://3.36.49.217/socket.io/:path*` },
     ];
   },
 };
