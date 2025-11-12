@@ -1,7 +1,7 @@
 // components/Header.tsx
 'use client';
 
-import { MENUS } from '@/lib/variable';
+import { baseUrl, MENUS } from '@/lib/variable';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -30,7 +30,7 @@ export default function Header() {
   const handleLogout = async () => {
     // (선택) 백엔드 쿠키 로그아웃도 함께 처리하고 싶다면 주석 해제
     try {
-      await fetchWithAuth('/backend/users/logout', { method: 'POST', credentials: 'include' });
+      await fetchWithAuth(`${baseUrl}/users/logout`, { method: 'POST', credentials: 'include' });
     } catch (_) { /* noop */ }
 
     // NextAuth 세션 종료
@@ -104,6 +104,7 @@ export default function Header() {
               <button
                 onClick={handleLogout}
                 className="hover:text-black"
+                style={{cursor:'pointer'}}
                 aria-label="logout"
               >
                 👤 로그아웃
