@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import DaumPostcodeFinder from "../ui/DaumPostcodeFinder";
 import { useSession } from "next-auth/react";
 import { fetchWithAuth } from "@/lib/fetchWitgAuth";
+import { uuid } from "@/lib/uid";
 // import { SeniorItem } from "@/lib/variable"; // 실제 타입이 있으면 이 라인을 사용하세요.
 
 
@@ -179,7 +180,7 @@ function SeniorRegisterModal({
 
         const item: SeniorItem = {
             id: Math.random(),
-            uniq_id: typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : String(Date.now()),
+            uniq_id: typeof crypto !== "undefined" && "randomUUID" in crypto ? uuid() : String(Date.now()),
             name: name.trim(),
             address: address.trim(),
             address_detail: addressDetail.trim(),

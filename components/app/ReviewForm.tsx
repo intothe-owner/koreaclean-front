@@ -1,6 +1,7 @@
 'use client';
 
 import { fetchWithAuth } from '@/lib/fetchWitgAuth';
+import { uuid } from '@/lib/uid';
 import { useMemo, useState } from 'react';
 
 export type ReviewFormValues = {
@@ -103,7 +104,7 @@ export default function ReviewForm({
 
         const item = data?.item ?? data; // 서버가 바로 item을 주거나 루트에 줄 수도 있음
         const payload: ReviewCreatedPayload = {
-          id: item?.id ?? crypto.randomUUID(),
+          id: item?.id ?? uuid(),
           title: item?.title ?? values.title,
           content: item?.content ?? values.content,
           rating: Number(item?.rating ?? values.rating),
@@ -114,7 +115,7 @@ export default function ReviewForm({
       } else {
         // ✅ 백엔드 없이 로컬 등록
         onCreated?.({
-          id: crypto.randomUUID(),
+          id: uuid(),
           title: values.title,
           content: values.content,
           rating: values.rating,

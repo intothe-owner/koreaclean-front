@@ -1,5 +1,6 @@
 "use client";
 
+import { uuid } from "@/lib/uid";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export type UploadedFile = {
@@ -131,7 +132,7 @@ export default function FileUpload({
       for (const f of take) {
         if (f.size > maxSizeMB * 1024 * 1024) {
           next.push({
-            key: crypto.randomUUID(),
+            key: uuid(),
             file: f,
             name: f.name,
             size: f.size,
@@ -146,7 +147,7 @@ export default function FileUpload({
         const previewUrl = isImage ? URL.createObjectURL(f) : undefined;
 
         next.push({
-          key: crypto.randomUUID(),
+          key: uuid(),
           file: f,
           name: f.name,
           size: f.size,
