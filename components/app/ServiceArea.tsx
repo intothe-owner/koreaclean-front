@@ -3,16 +3,18 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import AssRegionMultiSelect from '../ui/AssRegionMultiSelect';
+import { fetchWithAuth } from '@/lib/fetchWitgAuth';       // ✅ 토큰 자동첨부
+import { baseUrl } from '@/lib/variable';                   // ✅ API 베이스
 
 // ---- 유틸: "서울>강남구" 포맷 ----
 const joinKey = (sido: string, sigungu: string) => `${sido}>${sigungu}`;
-
-// "서울>강남구" → 분해
 const splitKey = (key: string) => {
   const i = key.indexOf('>');
   if (i < 0) return { sido: key, gugun: '' };
   return { sido: key.slice(0, i), gugun: key.slice(i + 1) };
 };
+
+type Region = { sido: string; gugun: string };
 
 type CompanyItem = {
   id: number;
@@ -20,15 +22,15 @@ type CompanyItem = {
   ceo: string;
   address: string;
   tel: string;
-  lat?: number;
-  lng?: number;
-  homepage?: string;
-  regions: { sido: string; gugun: string }[];
+  lat?: number | null;
+  lng?: number | null;
+  homepage?: string | null;
+  regions: Region[];
   status?: 'PENDING' | 'APPROVED' | 'REJECTED';
 };
 
-// ---- 더미데이터 ----
-const DUMMY: CompanyItem[] = [
+// ---- (옵션) 폴백 더미: API 실패 시 화면 유지용 ----
+const DUMMY_FALLBACK: CompanyItem[] = [
   {
     id: 1,
     name: '한국클린쿱 부산지사',
@@ -44,69 +46,8 @@ const DUMMY: CompanyItem[] = [
     ],
     status: 'APPROVED',
   },
-  {
-    id: 2,
-    name: '제로브이 서울센터',
-    ceo: '이서준',
-    address: '서울 강남구 테헤란로 501',
-    tel: '02-1234-5678',
-    lat: 37.5074,
-    lng: 127.055,
-    regions: [
-      { sido: '서울', gugun: '강남구' },
-      { sido: '서울', gugun: '서초구' },
-      { sido: '서울', gugun: '송파구' },
-    ],
-    status: 'APPROVED',
-  },
-  {
-    id: 3,
-    name: '경기 남부 클린케어',
-    ceo: '박지민',
-    address: '경기 수원시 팔달구 매산로1가',
-    tel: '031-222-3333',
-    lat: 37.2665,
-    lng: 127.0005,
-    regions: [
-      { sido: '경기', gugun: '수원시' },
-      { sido: '경기', gugun: '용인시' },
-      { sido: '경기', gugun: '화성시' },
-    ],
-    status: 'APPROVED',
-  },
-  {
-    id: 4,
-    name: '대구 시니어케어',
-    ceo: '최하늘',
-    address: '대구 수성구 달구벌대로',
-    tel: '053-987-6543',
-    lat: 35.8587,
-    lng: 128.6309,
-    regions: [
-      { sido: '대구', gugun: '수성구' },
-      { sido: '대구', gugun: '중구' },
-    ],
-    status: 'APPROVED',
-  },
-  {
-    id: 5,
-    name: '인천 클린파트너스',
-    ceo: '한지우',
-    address: '인천 남동구 인주대로',
-    tel: '032-456-7890',
-    lat: 37.4475,
-    lng: 126.7318,
-    regions: [
-      { sido: '인천', gugun: '남동구' },
-      { sido: '인천', gugun: '미추홀구' },
-    ],
-    status: 'APPROVED',
-  },
 ];
 
-// ===========================
-// ✅ Kakao SDK 로더 & Map 컴포넌트
-// ===========================
 declare global {
   interface Window {
     kakao?: any;
@@ -122,9 +63,7 @@ function ensureKakao(): Promise<void> {
   if (kakaoLoadingPromise) return kakaoLoadingPromise;
 
   kakaoLoadingPromise = new Promise<void>((resolve, reject) => {
-    if (!KAKAO_APP_KEY) {
-      console.warn('NEXT_PUBLIC_KAKAO_MAP_KEY 가 설정되어 있지 않습니다.');
-    }
+    if (!KAKAO_APP_KEY) console.warn('NEXT_PUBLIC_KAKAO_MAP_KEY 가 설정되어 있지 않습니다.');
     const existing = document.getElementById('kakao-map-sdk') as HTMLScriptElement | null;
     if (existing) {
       existing.addEventListener('load', () => window.kakao.maps.load(() => resolve()));
@@ -135,13 +74,8 @@ function ensureKakao(): Promise<void> {
     script.id = 'kakao-map-sdk';
     script.async = true;
     script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_APP_KEY}&autoload=false`;
-    console.log(script.src);
     script.addEventListener('load', () => {
-      try {
-        window.kakao.maps.load(() => resolve());
-      } catch (e) {
-        reject(e);
-      }
+      try { window.kakao.maps.load(() => resolve()); } catch (e) { reject(e); }
     });
     script.addEventListener('error', (e) => reject(e));
     document.head.appendChild(script);
@@ -160,7 +94,7 @@ function KakaoMap({
   lat: number;
   lng: number;
   title?: string;
-  level?: number;   // 1(가까움) ~ 14(멀어짐)
+  level?: number;
   height?: number;
 }) {
   const mapRef = useRef<HTMLDivElement | null>(null);
@@ -178,14 +112,11 @@ function KakaoMap({
       const center = new maps.LatLng(lat, lng);
 
       map = new maps.Map(mapRef.current, { center, level });
-      // 줌 컨트롤
       control = new maps.ZoomControl();
       map.addControl(control, maps.ControlPosition.RIGHT);
 
-      // 마커
       marker = new maps.Marker({ position: center, map, title });
 
-      // 인포윈도우
       if (title) {
         const iw = new maps.InfoWindow({ content: `<div style="padding:6px 8px;">${title}</div>` });
         iw.open(map, marker);
@@ -193,7 +124,6 @@ function KakaoMap({
     })();
 
     return () => {
-      // Kakao Maps는 dispose가 따로 없어 DOM만 정리
       marker = null;
       control = null;
       map = null;
@@ -206,25 +136,6 @@ function KakaoMap({
 // ===========================
 // 공용 UI
 // ===========================
-const Chip = ({
-  children,
-  selected,
-  onClick,
-}: {
-  children: React.ReactNode;
-  selected?: boolean;
-  onClick?: () => void;
-}) => (
-  <button
-    onClick={onClick}
-    className={`px-3 py-1 rounded-full text-sm border transition ${
-      selected ? 'bg-black text-white border-black' : 'bg-white text-neutral-700 border-neutral-300 hover:bg-neutral-100'
-    }`}
-  >
-    {children}
-  </button>
-);
-
 const Modal = ({
   open,
   title,
@@ -242,9 +153,7 @@ const Modal = ({
       <div className="w-full max-w-3xl rounded-2xl bg-white shadow-lg">
         <div className="flex items-center justify-between px-4 py-3 border-b">
           <h3 className="font-semibold">{title || '지도'}</h3>
-          <button onClick={onClose} className="rounded px-2 py-1 hover:bg-neutral-100">
-            닫기
-          </button>
+          <button onClick={onClose} className="rounded px-2 py-1 hover:bg-neutral-100">닫기</button>
         </div>
         <div className="p-4">{children}</div>
       </div>
@@ -252,7 +161,7 @@ const Modal = ({
   );
 };
 
-// 지역 요약 (ex: "부산 해운대구 외 2")
+// 지역 요약
 const summarizeRegions = (regions: CompanyItem['regions']) => {
   if (!regions || regions.length === 0) return '-';
   const [first, ...rest] = regions;
@@ -261,6 +170,11 @@ const summarizeRegions = (regions: CompanyItem['regions']) => {
 };
 
 export default function ServiceArea() {
+  // ✅ 서버에서 불러온 업체 목록
+  const [companies, setCompanies] = useState<CompanyItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   // RegionMultiSelect 값: "시도>구군" 배열
   const [regions, setRegions] = useState<string[]>([]);
   // 검색
@@ -270,17 +184,68 @@ export default function ServiceArea() {
   const [mapOpen, setMapOpen] = useState(false);
   const [targetId, setTargetId] = useState<number | null>(null);
 
+  // ✅ 최초 1회: 목록 불러오기 (승인된 업체만)
+  useEffect(() => {
+    let aborted = false;
+
+    (async () => {
+      setLoading(true);
+      setError(null);
+
+      // 백엔드 엔드포인트는 필요에 맞게 조정하세요.
+      // 예) `${baseUrl}/api/companies?status=APPROVED`
+      // 혹은 Nginx 프록시라면 `/backend/companies?status=APPROVED`
+      const url = `${baseUrl}/api/companies?status=APPROVED`;
+
+      try {
+        const res = await fetchWithAuth(url, { method: 'GET' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        // 백엔드 스키마에 따라 맵핑
+        const list: CompanyItem[] = (Array.isArray(data?.rows) ? data.rows : Array.isArray(data) ? data : []).map((it: any) => ({
+          id: Number(it.id),
+          name: String(it.name ?? it.company_name ?? ''),
+          ceo: String(it.ceo ?? it.representative ?? ''),
+          address: String(it.address ?? ''),
+          tel: String(it.tel ?? it.phone ?? ''),
+          lat: it.lat != null ? Number(it.lat) : null,
+          lng: it.lng != null ? Number(it.lng) : null,
+          homepage: it.homepage ?? it.homepage_url ?? null,
+          regions:
+            Array.isArray(it.regions)
+              ? it.regions.map((r: any) => ({ sido: String(r.sido ?? r.si ?? r.sido_name ?? ''), gugun: String(r.gugun ?? r.gu ?? r.sigungu_name ?? '') }))
+              : Array.isArray(it.region_list)
+                ? it.region_list.map((r: any) => ({ sido: String(r.sido ?? ''), gugun: String(r.gugun ?? '') }))
+                : [], // 없으면 빈 배열
+          status: (it.status as CompanyItem['status']) ?? 'APPROVED',
+        }));
+
+        if (!aborted) setCompanies(list);
+      } catch (e: any) {
+        console.error('회사 목록 불러오기 실패:', e);
+        if (!aborted) {
+          setError(e?.message || '목록을 불러오지 못했습니다.');
+          // 폴백 더미로 화면 유지 (원치 않으면 아래 두 줄 제거)
+          setCompanies(DUMMY_FALLBACK);
+        }
+      } finally {
+        if (!aborted) setLoading(false);
+      }
+    })();
+
+    return () => { aborted = true; };
+  }, []);
+
   const filtered = useMemo(() => {
     const q = keyword.trim().toLowerCase();
 
-    return DUMMY.filter((c) => {
-      // 지역 필터
+    return companies.filter((c) => {
       const regionOK =
         regions.length === 0
           ? true
-          : c.regions.some((r) => regions.includes(joinKey(r.sido, r.gugun)));
+          : c.regions?.some((r) => regions.includes(joinKey(r.sido, r.gugun)));
 
-      // 텍스트 필터
       const textOK =
         q.length === 0
           ? true
@@ -290,11 +255,11 @@ export default function ServiceArea() {
 
       return regionOK && textOK;
     });
-  }, [regions, searchBy, keyword]);
+  }, [companies, regions, searchBy, keyword]);
 
   const target = useMemo(
-    () => DUMMY.find((d) => d.id === targetId) || null,
-    [targetId]
+    () => companies.find((d) => d.id === targetId) || null,
+    [targetId, companies]
   );
 
   const reset = () => {
@@ -307,7 +272,6 @@ export default function ServiceArea() {
     <div className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
       <div className="mb-3 font-semibold">주요 서비스 지역</div>
 
-      {/* --- 지역 멀티셀렉트 --- */}
       <AssRegionMultiSelect
         label="지역 선택"
         value={regions}
@@ -316,12 +280,8 @@ export default function ServiceArea() {
         className="mb-4"
       />
 
-      {/* 선택칩 + 개별 삭제 */}
       <div className="mt-3 flex flex-wrap items-center gap-2">
-        <button
-          onClick={reset}
-          className="rounded-md border border-neutral-300 px-3 py-1 text-sm hover:bg-neutral-50"
-        >
+        <button onClick={reset} className="rounded-md border border-neutral-300 px-3 py-1 text-sm hover:bg-neutral-50">
           초기화
         </button>
 
@@ -352,7 +312,7 @@ export default function ServiceArea() {
         })}
       </div>
 
-      {/* --- 검색 (돋보기 버튼 포함) --- */}
+      {/* 검색 */}
       <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-[140px_1fr]">
         <div className="inline-flex items-center gap-2">
           <select
@@ -390,12 +350,13 @@ export default function ServiceArea() {
         </div>
       </div>
 
-      {/* --- 결과 카운트 --- */}
+      {/* 결과 카운트 / 로딩 / 에러 */}
       <div className="mt-6 text-sm text-neutral-600">
-        총 <b>{filtered.length}</b>개 업체
+        {loading ? '불러오는 중…' : <>총 <b>{filtered.length}</b>개 업체</>}
+        {error && <span className="ml-2 text-red-500">({error})</span>}
       </div>
 
-      {/* PC: 게시판(표)형 */}
+      {/* PC 테이블 */}
       <div className="mt-3 hidden md:block">
         <div className="overflow-x-auto rounded-xl border border-neutral-200">
           <table className="min-w-full text-sm">
@@ -432,7 +393,7 @@ export default function ServiceArea() {
                   </td>
                 </tr>
               ))}
-              {filtered.length === 0 && (
+              {(!loading && filtered.length === 0) && (
                 <tr>
                   <td colSpan={6} className="px-4 py-12 text-center text-neutral-400">검색 조건에 맞는 결과가 없습니다.</td>
                 </tr>
@@ -442,7 +403,7 @@ export default function ServiceArea() {
         </div>
       </div>
 
-      {/* 모바일: 카드 리스트형 */}
+      {/* 모바일 카드 */}
       <div className="mt-3 grid grid-cols-1 gap-3 md:hidden">
         {filtered.map((c) => (
           <div key={c.id} className="rounded-xl border border-neutral-200 bg-white p-4">
@@ -473,12 +434,12 @@ export default function ServiceArea() {
             </div>
           </div>
         ))}
-        {filtered.length === 0 && (
+        {(!loading && filtered.length === 0) && (
           <div className="rounded-xl border border-neutral-200 bg-white p-8 text-center text-neutral-400">검색 조건에 맞는 결과가 없습니다.</div>
         )}
       </div>
 
-      {/* --- 지도 모달: ✅ 카카오지도 적용 --- */}
+      {/* 지도 모달 */}
       <Modal
         open={mapOpen}
         onClose={() => setMapOpen(false)}
@@ -494,10 +455,8 @@ export default function ServiceArea() {
               좌표: {target.lat}, {target.lng}
             </div>
 
-            {/* 카카오 지도 */}
             <KakaoMap lat={target.lat} lng={target.lng} title={target.name} height={360} level={3} />
 
-            {/* 카카오맵 링크 (지도보기/길찾기) */}
             <div className="flex items-center justify-end gap-3 text-sm">
               <a
                 className="underline"
