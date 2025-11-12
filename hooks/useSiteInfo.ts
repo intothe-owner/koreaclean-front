@@ -1,10 +1,10 @@
 // hooks/useSiteInfo.ts
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { SiteInfoDto } from "@/lib/variable"; 
+import { baseUrl, SiteInfoDto } from "@/lib/variable"; 
 import { fetchWithAuth } from "@/lib/fetchWitgAuth";
 
 async function fetchSiteInfo(): Promise<SiteInfoDto> {
-  const res = await fetchWithAuth("/backend/site/detail", { cache: "no-store" });
+  const res = await fetchWithAuth(`${baseUrl}/site/detail`, { cache: "no-store" });
   const data = await res.json();
   if (!res.ok || data?.is_success === false) {
     throw new Error(data?.message || "사이트 정보 조회 실패");
