@@ -13,11 +13,12 @@ import "swiper/css/pagination";
 import "swiper/css/navigation";
 
 import { useMainBanners, SlideItem } from "@/hooks/useMainBanners";
+import { baseUrl } from "@/lib/variable";
 
 /** 업로드/저장/목록 API */
-const API_UPLOAD = "/backend/upload/banner-upload";
-const API_SAVE = "/backend/banners/save";
-const API_LIST = "/backend/banners/list";
+const API_UPLOAD = `${baseUrl}/upload/banner-upload`;
+const API_SAVE = `${baseUrl}/banners/save`;
+const API_LIST = `${baseUrl}/banners/list`;
 
 /** 폰트 옵션 */
 const FONT_OPTIONS = [
