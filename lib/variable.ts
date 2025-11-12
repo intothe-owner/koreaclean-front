@@ -1,6 +1,6 @@
 import { RowKey } from "@/hooks/usePricing";
 import { useQuery } from "@tanstack/react-query";
-export const baseUrl = 'http://113.131.151.103:4500';
+export const baseUrl = 'http://3.36.49.217';
 // export const baseUrl = 'http://localhost:4500';
 export type MenuItem = {
     id?: string;
