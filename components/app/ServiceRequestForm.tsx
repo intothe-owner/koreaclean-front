@@ -1,7 +1,7 @@
 // app/service-request/page.tsx
 "use client";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { RequestForm, SeniorItem } from "@/lib/variable";
+import { baseUrl, RequestForm, SeniorItem } from "@/lib/variable";
 import { formatMobile, formContact } from "@/lib/function";
 import SeniorRegisterModal from "./SeniorRegisterModal";
 import { BulkSeniorUploadModal } from "./BulkSeniorUploadModal";
@@ -42,7 +42,7 @@ const addDays = (base: Date, n: number) => {
 // ===== 메인: 서비스 신청 폼 =====
 export default function ServiceRequestForm({
   saveEndpoint = `/backend/request/save`,
-  uploadEndpoint = `/backend/upload/request-upload`,
+  uploadEndpoint = `${baseUrl}/upload/request-upload`,
   onCreated,
 }: {
   saveEndpoint?: string;
@@ -560,8 +560,8 @@ useEffect(() => {
             value={Array.isArray(form.files) ? (form.files as unknown as UploadedFile[]) : []}
             onChange={(files) => handleChange({ files: files as unknown as JSON })}
             accept="image/*,.pdf,.xlsx,.xls,.doc,.docx"
-            maxFiles={10}
-            maxSizeMB={20}
+           maxSizeMB={50}
+  maxFiles={10}
             multiple
           />
         </div>

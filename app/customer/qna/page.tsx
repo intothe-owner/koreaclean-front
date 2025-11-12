@@ -19,6 +19,7 @@ import Link from 'next/link';
 
 import { useSession } from 'next-auth/react';
 import { fetchWithAuth } from '@/lib/fetchWitgAuth';
+import { baseUrl } from '@/lib/variable';
 type QnaType = '서비스 신청' | '변경' | '취소' | '불만사항' | '제안';
 const MAX_CONTENT = 1000;
 
@@ -272,12 +273,12 @@ export default function QnaPage() {
                 <div>
                   <FileUpload
                     label="첨부 파일"
-                    uploadEndpoint="/backend/upload/qna-upload"
+                    uploadEndpoint={`${baseUrl}/upload/qna-upload`}
                     value={files}
                     onChange={(list) => setFiles(list)}
                     accept="image/*,.pdf,.xlsx,.xls,.doc,.docx"
-                    maxFiles={10}
-                    maxSizeMB={20}
+                    maxSizeMB={50}
+  maxFiles={10}
                     multiple
                   />
                 </div>

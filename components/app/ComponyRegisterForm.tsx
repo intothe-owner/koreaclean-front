@@ -89,7 +89,7 @@ function TagInput({
 // ====== Main Form Component ======
 export default function CompanyCreateForm({
   saveEndpoint = "/backend/company/save", // 실제 서버 엔드포인트로 교체하세요 (예: `${baseUrl}/company`)
-  uploadEndpoint = `/backend/upload/company-upload`,
+  uploadEndpoint = `${baseUrl}/upload/company-upload`,
   onCreated,
 }: {
   saveEndpoint?: string;
@@ -429,8 +429,8 @@ export default function CompanyCreateForm({
             value={Array.isArray(form.documents) ? (form.documents as unknown as UploadedFile[]) : []}
             onChange={(files) => handleChange({ documents: files as unknown as JSON })}
             accept="사업자 등록증/자격증/경력증명서/건물위생관리업신고증 등 올려주세요"
-            maxFiles={10}
-            maxSizeMB={100}
+           maxSizeMB={50}
+  maxFiles={10}
             multiple
           />
         </div>

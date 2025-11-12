@@ -137,8 +137,8 @@ export default function ScreenSetPage() {
                 value={uploads}
                 onChange={(files) => syncUploadsToSlides(files, FONT_OPTIONS[0].value)}
                 accept="image/*"
-                maxFiles={20}
-                maxSizeMB={20}
+               maxSizeMB={50}
+  maxFiles={10}
                 multiple
                 label="배너 이미지"
               />
