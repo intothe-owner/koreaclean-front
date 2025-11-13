@@ -1,9 +1,18 @@
 // components/app/ServiceProcedureGuide.tsx
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, Fragment } from 'react';
 import { motion } from 'framer-motion';
-import { FileText, ClipboardCheck, Calendar, Sparkles, ShieldCheck } from 'lucide-react';
+import {
+  FileText,
+  ClipboardCheck,
+  Calendar,
+  Sparkles,
+  ShieldCheck,
+  ArrowRight,
+  ArrowDown,
+  ArrowLeft,
+} from 'lucide-react';
 
 export type ServiceStep = {
   title: string;
@@ -35,36 +44,127 @@ export default function ServiceProcedureGuide({
   subtitle?: string;
   className?: string;
 }) {
+  // PC용 위치 매핑: 4열 2행 그리드
+  // 1 2 3 4
+  //   7 6 5
+  const mdPos: Record<number, string> = {
+    1: 'md:row-start-1 md:col-start-1',
+    2: 'md:row-start-1 md:col-start-2',
+    3: 'md:row-start-1 md:col-start-3',
+    4: 'md:row-start-1 md:col-start-4',
+    5: 'md:row-start-2 md:col-start-4',
+    6: 'md:row-start-2 md:col-start-3',
+    7: 'md:row-start-2 md:col-start-2',
+  };
+
   return (
     <section className={className}>
       {showHeader && (
         <div className="mb-4">
-          <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-neutral-900">{title}</h2>
+          <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-neutral-900">
+            {title}
+          </h2>
           <p className="text-neutral-600 mt-1">{subtitle}</p>
         </div>
       )}
 
-      <ol className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-4">
-        {steps.map((s, idx) => (
-          <motion.li
-            key={`${s.title}-${idx}`}
-            initial={{ opacity: 0, y: 8 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.25, delay: 0.03 * idx }}
-            className="rounded-2xl border border-neutral-200 bg-white p-5"
-          >
-            <div className="inline-flex items-center justify-center w-20 h-8 rounded-full bg-neutral-900 text-white text-sm font-bold">
-              {idx + 1} 단계
-            </div>
-            <div className="mt-3 font-semibold text-neutral-900 flex items-center gap-2">
-              <StepIcon index={idx} override={s.icon} /> {s.title}
-            </div>
-            <p className="text-sm text-neutral-600 mt-1 leading-relaxed">{s.desc}</p>
-          </motion.li>
-        ))}
+      {/* 모바일: 1열, PC: 4열 2행(S자 흐름) */}
+      <ol className="grid grid-cols-1 md:grid-cols-4 md:auto-rows-[1fr] gap-4 md:gap-x-6 md:gap-y-10">
+        {steps.map((s, idx) => {
+          const stepNo = idx + 1;
+          const isLast = idx === steps.length - 1;
+          const posClass = mdPos[stepNo] ?? '';
+
+          return (
+            <Fragment key={`${s.title}-${idx}`}>
+              <ServiceStepCard
+                stepNo={stepNo}
+                title={s.title}
+                desc={s.desc}
+                icon={s.icon}
+                isLast={isLast}
+                className={posClass}
+                animateDelay={0.03 * idx}
+              />
+              {/* 모바일 전용 ↓ : 카드 바깥, 카드와 카드 사이에 배치 */}
+              {!isLast && (
+                <li className="md:hidden flex justify-center py-1">
+                  <ArrowDown className="w-4 h-4 text-neutral-900" />
+                </li>
+              )}
+            </Fragment>
+          );
+        })}
       </ol>
     </section>
+  );
+}
+
+function ServiceStepCard({
+  stepNo,
+  title,
+  desc,
+  icon,
+  isLast,
+  className,
+  animateDelay,
+}: {
+  stepNo: number;
+  title: string;
+  desc: string;
+  icon?: ReactNode;
+  isLast: boolean;
+  className?: string;
+  animateDelay?: number;
+}) {
+  // 화살표 방향 결정 (PC 전용)
+  // 1,2,3: →
+  // 4: ↓ (4 → 5)
+  // 5,6: ← (5 → 6 → 7)
+  let arrow: 'right' | 'down' | 'left' | null = null;
+  if (!isLast) {
+    if (stepNo === 4) arrow = 'down';
+    else if (stepNo === 5 || stepNo === 6) arrow = 'left';
+    else arrow = 'right';
+  }
+
+  return (
+    <motion.li
+      initial={{ opacity: 0, y: 8 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.25, delay: animateDelay ?? 0 }}
+      className={`relative rounded-2xl border border-neutral-200 bg-white p-5 ${className ?? ''}`}
+    >
+      <div className="inline-flex items-center justify-center w-20 h-8 rounded-full bg-neutral-900 text-white text-sm font-bold">
+        {stepNo} 단계
+      </div>
+      <div className="mt-3 font-semibold text-neutral-900 flex items-center gap-2">
+        <StepIcon index={stepNo - 1} override={icon} /> {title}
+      </div>
+      <p className="text-sm text-neutral-600 mt-1 leading-relaxed">{desc}</p>
+
+      {/* PC 전용 화살표 */}
+      {arrow && (
+        <div className="hidden md:block">
+          {arrow === 'right' && (
+            <div className="absolute -right-5 top-1/2 -translate-y-1/2">
+              <ArrowRight className="w-5 h-5 text-neutral-900" />
+            </div>
+          )}
+          {arrow === 'left' && (
+            <div className="absolute -left-5 top-1/2 -translate-y-1/2">
+              <ArrowLeft className="w-5 h-5 text-neutral-900" />
+            </div>
+          )}
+          {arrow === 'down' && (
+            <div className="absolute left-1/2 -bottom-6 -translate-x-1/2">
+              <ArrowDown className="w-5 h-5 text-neutral-900" />
+            </div>
+          )}
+        </div>
+      )}
+    </motion.li>
   );
 }
 
@@ -81,9 +181,17 @@ function StepIcon({ index, override }: { index: number; override?: ReactNode }) 
       return <Sparkles className="w-4 h-4" />;
     case 4:
       return (
-        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3l2-3h8l2 3h3a2 2 0 0 1 2 2z"/>
-          <circle cx="12" cy="13" r="4"/>
+        <svg
+          className="w-4 h-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3l2-3h8l2 3h3a2 2 0 0 1 2 2z" />
+          <circle cx="12" cy="13" r="4" />
         </svg>
       );
     default:

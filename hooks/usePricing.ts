@@ -4,15 +4,9 @@
 import { fetchWithAuth } from "@/lib/fetchWitgAuth";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-export type RowKey = "totalCare" | "generalCleaning" | "disinfection" | "acDeepClean" | "etc";
+export type RowKey = "airConditioner" | "kitchen" | "restroom" | "acDeepClean";
 
-export const KEYS: RowKey[] = [
-  "totalCare",
-  "generalCleaning",
-  "disinfection",
-  "acDeepClean",
-  "etc",
-];
+export const KEYS: RowKey[] = ["airConditioner", "kitchen", "restroom", "acDeepClean"];
 
 // 숫자만 유지
 const onlyDigits = (v: string) => v.replace(/[^\d]/g, "");
@@ -32,11 +26,10 @@ export function usePricing(options?: {
   const autoLoad = options?.autoLoad ?? true;
 
   const [raw, setRaw] = useState<RawState>({
-    totalCare: "",
-    generalCleaning: "",
-    disinfection: "",
-    acDeepClean: "",
-    etc: "",
+    airConditioner: "",
+    kitchen: "",
+    restroom: "",
+    acDeepClean: ""
   });
 
   const [loading, setLoading] = useState(false);

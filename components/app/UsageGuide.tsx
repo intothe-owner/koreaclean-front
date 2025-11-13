@@ -51,11 +51,11 @@ export default function UsageGuide({ title = '이용 안내', subtitle = '예약
         )}
       </AnimatePresence>
 
-      <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
         {Array.from({ length: screenshotCount }).map((_, i) => (
           <div key={i} className="aspect-[16/10] rounded-2xl border border-dashed border-neutral-300 bg-white/60 grid place-items-center text-neutral-400 text-sm">화면샷 {i + 1}</div>
         ))}
-      </div>
+      </div> */}
     </section>
   );
 }

@@ -128,7 +128,7 @@ export default function Achievements({
     <div className="space-y-12">
       {/* 1) 타이틀 */}
       <section className="rounded-2xl border border-neutral-200 bg-white p-6">
-        <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-neutral-900">간단한 성과 현황</h2>
+        <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-neutral-900">성과 현황</h2>
         <p className="text-neutral-600 mt-1">
           월별 추이와 지역 분포, 핵심 KPI(경로당·연간건수·참여기업)를 한눈에 확인하세요.
         </p>

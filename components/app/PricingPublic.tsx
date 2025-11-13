@@ -3,17 +3,16 @@
 import { fetchWithAuth } from "@/lib/fetchWitgAuth";
 import { useEffect, useState } from "react";
 
-type RowKey = "totalCare" | "generalCleaning" | "disinfection" | "acDeepClean" | "etc";
+type RowKey = "airConditioner" | "kitchen" | "restroom" | "acDeepClean";
 
 const LABELS: Record<RowKey, string> = {
-  totalCare: "토탈케어서비스",
-  generalCleaning: "대행청소",
-  disinfection: "소독방역",
-  acDeepClean: "에어컨종합세척",
-  etc: "기타",
+  airConditioner: "에어컨청소",
+  kitchen: "주방",
+  restroom: "화장실",
+  acDeepClean: "방역소독"
 };
 
-const KEYS: RowKey[] = ["totalCare", "generalCleaning", "disinfection", "acDeepClean", "etc"];
+const KEYS: RowKey[] = ["airConditioner", "kitchen", "restroom", "acDeepClean"];
 
 // 3자리 콤마 + '원'
 const fmtKRW = (v?: number) =>
@@ -61,11 +60,10 @@ export default function PricingPublic({
   fetchUrl?: string;
 }) {
   const [data, setData] = useState<Record<RowKey, number>>({
-    totalCare: 0,
-    generalCleaning: 0,
-    disinfection: 0,
+    airConditioner: 0,
+    kitchen: 0,
+    restroom: 0,
     acDeepClean: 0,
-    etc: 0,
   });
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);

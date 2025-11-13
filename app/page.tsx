@@ -11,42 +11,71 @@ import Header from '@/components/app/Header';
 
 import { IoMdArrowRoundForward } from "react-icons/io";
 import MainBannerSwiper from '@/components/app/MainBannerSwiper';
+
+// ✅ framer-motion 추가
+import { motion } from 'framer-motion';
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 40 },
+  visible: { opacity: 1, y: 0 },
+};
+
+const fadeIn = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0 },
+};
+
 export default function Home() {
-  
   return (
     <div className="relative w-full min-h-screen bg-[#f9f5f2]">
       {/* 헤더 */}
       <Header />
-      {/* 배경 스와이퍼 */}
-      {/* <CenterSwiper /> */}
-      
 
+      {/* 메인 배너 */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, ease: 'easeOut' }}
+      >
+        <MainBannerSwiper
+          src="/backend/banners/main-banners"
+          height={560}
+          rounded="rounded-3xl"
+          autoplayDelayMs={5000}
+          loop
+          showDots
+          showNav
+        />
+      </motion.div>
 
-      {/* 히어로 카드 */}
-      {/* <HeroCard title='경로당 맞춤형 청소' content='예약부터 사후관리까지 한번에' /> */}
-      <MainBannerSwiper
-        src="/backend/banners/main-banners"
-        height={560}
-        rounded="rounded-3xl"
-        autoplayDelayMs={5000}
-        loop
-        showDots
-        showNav
-      />
-      {/* ③ 텍스트 섹션 */}
-      <section className="relative z-10 bg-[#f9f5f2]">
+      {/* ③ 한국클린쿱 간단 소개 섹션 (텍스트 키움 + 스크롤 애니메이션) */}
+      <motion.section
+        className="relative z-10 bg-[#f9f5f2]"
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.7, ease: 'easeOut' }}
+      >
         <div className="max-w-7xl mx-auto px-8 py-16 grid md:grid-cols-2 gap-10 items-start">
           {/* 왼쪽 타이틀 */}
-          <div>
-            <h2 className="text-3xl lg:text-4xl font-extrabold text-gray-900 leading-tight">
+          <motion.div
+            variants={fadeIn}
+            transition={{ duration: 0.6, ease: 'easeOut', delay: 0.1 }}
+          >
+            <h2 className="text-4xl lg:text-5xl font-extrabold text-gray-900 leading-tight">
               최첨단 청소 업체<br />한국클린쿱
             </h2>
-          </div>
+          </motion.div>
 
           {/* 오른쪽 본문 + 더 알아보기 */}
-          <div className="flex items-start gap-4">
+          <motion.div
+            className="flex items-start gap-4"
+            variants={fadeIn}
+            transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
+          >
             <div>
-              <p className="text-gray-800 leading-relaxed">
+              <p className="mt-2 text-lg text-gray-800 leading-relaxed">
                 어르신들의 건강 관리 <b>한국클린쿱</b>이 책임지겠습니다.
                 <br />
                 <b>AI와 IoT</b>를 통한 실시간 모니터링과
@@ -55,23 +84,31 @@ export default function Home() {
               </p>
 
               <Button
-                className="mt-5 rounded-lg bg-white border border-gray-400 text-black hover:bg-gray-100"
+                className="mt-6 rounded-lg bg-white border border-gray-400 text-base text-black px-6 py-2.5 hover:bg-gray-100"
               >
                 더 알아보기
               </Button>
             </div>
-          </div>
+          </motion.div>
         </div>
-      </section>
-      {/* ④ 한국클린쿱과 함께 */}
-      <section className="relative z-10 bg-[#f9f5f2]">
+      </motion.section>
+
+      {/* ④ 한국클린쿱과 함께 (카드 + hover 애니메이션) */}
+      <motion.section
+        className="relative z-10 bg-[#f9f5f2]"
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.7, ease: 'easeOut' }}
+      >
         <div className="max-w-7xl mx-auto px-8 pt-4 pb-12">
-          <h3 className="text-xl md:text-2xl font-extrabold mb-4">한국클린쿱과 함께</h3>
+          <h3 className="text-2xl md:text-3xl font-extrabold mb-4">한국클린쿱과 함께</h3>
 
           {/* 래퍼: 반응형 그리드. lg 이상에서는 데이터 갯수(arr.length)만큼 컬럼 생성 */}
           <div
             className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:[grid-template-columns:repeat(var(--cols),minmax(0,1fr))]"
-            style={{ ['--cols' as any]: ([{}, {}].length) }} // ← 런타임에서 arr.length로 덮어씀(아래 map에서)
+            style={{ ['--cols' as any]: ([{}, {}].length) }}
           >
             {[
               {
@@ -85,27 +122,37 @@ export default function Home() {
                 img: '/images/main-login.png',
               },
             ].map((card, i, arr) => (
-              <div
+              <motion.div
                 key={i}
-                // lg 구간에서 컬럼 수를 동적으로 결정하기 위해 CSS 변수 주입
                 style={{ ['--cols' as any]: arr.length }}
                 className="relative rounded-2xl bg-white shadow-sm border border-black/10 p-5"
+                whileHover={{
+                  y: -6,
+                  scale: 1.02,
+                  boxShadow:
+                    '0 18px 35px rgba(15, 23, 42, 0.12)',
+                }}
+                transition={{ type: 'spring', stiffness: 260, damping: 20 }}
               >
                 {/* 상단: 텍스트 + 버튼 */}
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
-                    <h4 className="text-base sm:text-lg font-bold">{card.title}</h4>
-                    <p className="mt-2 text-sm text-gray-600 leading-relaxed">{card.desc}</p>
+                    <h4 className="text-lg md:text-xl font-bold">{card.title}</h4>
+                    <p className="mt-3 text-sm md:text-base text-gray-600 leading-relaxed">
+                      {card.desc}
+                    </p>
                   </div>
-                  <button
+                  <motion.button
                     aria-label="자세히"
                     className="shrink-0 h-8 w-8 rounded-lg border border-black/30 flex items-center justify-center text-lg leading-none transition-colors duration-300 hover:bg-gray-50"
+                    whileHover={{ rotate: 15 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 15 }}
                   >
                     <IoMdArrowRoundForward />
-                  </button>
+                  </motion.button>
                 </div>
 
-                {/* 일러스트: 오른쪽 하단 고정 + 반응형 높이 */}
+                {/* 일러스트 */}
                 <div className="mt-4 relative h-28 sm:h-32 lg:h-36 w-full">
                   <Image
                     src={card.img}
@@ -116,61 +163,193 @@ export default function Home() {
                     priority={i === 0}
                   />
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
-
         </div>
-      </section>
+      </motion.section>
 
-      {/* ⑤ 뉴스에 나온 한국클린쿱 */}
-      {/* <section className="relative z-10 bg-white">
-        <div className="max-w-7xl mx-auto px-8 py-10"> */}
-      {/* <h3 className="text-xl md:text-2xl font-extrabold mb-6">뉴스에 나온 한국클린쿱</h3> */}
+      {/* ⑤ 한국클린쿱에 대한 상세 소개 섹션 (스크롤 애니메이션) */}
+      <motion.section
+        className="relative z-10 bg-white"
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.25 }}
+        transition={{ duration: 0.7, ease: 'easeOut' }}
+      >
+        <div className="max-w-7xl mx-auto px-8 py-16 grid lg:grid-cols-2 gap-12 items-start">
+          {/* 왼쪽: 소개 텍스트 */}
+          <motion.div
+            variants={fadeIn}
+            transition={{ duration: 0.6, ease: 'easeOut', delay: 0.1 }}
+          >
+            <h3 className="text-2xl md:text-3xl font-extrabold text-gray-900">
+              한국클린쿱은
+            </h3>
+            <p className="mt-4 text-base md:text-lg text-gray-700 leading-relaxed">
+              <b>사회적협동조합 한국클린쿱</b>은 전국 어르신 돌봄 공간과
+              경로당, 취약계층 가구를 대상으로 전문 청소 서비스를 제공하는
+              사회적 경제 조직입니다.
+              <br />
+              단순 청소를 넘어, <b>실내 공기질 관리</b>와 <b>감염병 예방</b>,
+              <b>안전한 생활환경 조성</b>까지 함께 고민하며, 지자체·공공기관·
+              민간기업과의 협력을 통해 지속 가능한 돌봄 모델을 만들어가고 있습니다.
+            </p>
 
-      {/* <div className="divide-y divide-black/10">
+            <div className="mt-8 grid sm:grid-cols-2 gap-4">
+              <motion.div
+                className="rounded-2xl border border-gray-100 bg-[#f9f5f2] px-5 py-4"
+                variants={fadeIn}
+                transition={{ duration: 0.5, ease: 'easeOut', delay: 0.2 }}
+              >
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  핵심 서비스
+                </p>
+                <p className="mt-2 text-sm md:text-base text-gray-800">
+                  경로당·노인복지시설 청소, 에어컨 종합세척, 공기청정기 관리,
+                  소독·방역, 저장강박·쓰레기집 특수청소 등 맞춤형 클린 케어.
+                </p>
+              </motion.div>
+              <motion.div
+                className="rounded-2xl border border-gray-100 bg-[#f9f5f2] px-5 py-4"
+                variants={fadeIn}
+                transition={{ duration: 0.5, ease: 'easeOut', delay: 0.3 }}
+              >
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  한국클린쿱의 강점
+                </p>
+                <p className="mt-2 text-sm md:text-base text-gray-800">
+                  전국 네트워크 기반의 신속한 대응, 표준화된 매뉴얼, 전문 교육을
+                  이수한 청소 전문가, 그리고 데이터 기반 운영 시스템을 갖추고 있습니다.
+                </p>
+              </motion.div>
+            </div>
+          </motion.div>
+
+          {/* 오른쪽: 포인트 카드들 */}
+          <motion.div
+            className="space-y-4"
+            variants={fadeIn}
+            transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
+          >
             {[
               {
-                title: '“한국클린쿱 경기도 지역 100여개 무료 봉사”',
-                src: '경기일보',
-                date: '2025-07-31',
-                href: '#',
+                title: '어르신 맞춤형 청소·케어',
+                desc: '이동 동선, 사용 빈도, 건강 상태를 고려한 동선 정리와 청소 방식으로 어르신이 안전하고 편안하게 생활할 수 있는 환경을 만듭니다.',
               },
               {
-                title: '“한국클린쿱 경기도 지역 100여개 무료 봉사”',
-                src: '경기일보',
-                date: '2025-07-31',
-                href: '#',
+                title: 'AI · IoT 기반 모니터링',
+                desc: '공기질·사용 패턴·청소 이력 등을 데이터로 기록하여, 사후관리와 정기 점검까지 한 번에 관리할 수 있는 시스템을 준비하고 있습니다.',
               },
-            ].map((news, i) => (
-              <a
-                key={i}
-                href={news.href}
-                className="block py-6 hover:bg-black/[0.02] transition"
+              {
+                title: '지자체·공공기관 파트너',
+                desc: '지자체 경로당 청소, 공기청정기 유지관리, 취약계층 환경개선 사업 등 다양한 공공 프로젝트를 통해 지역 사회의 돌봄 인프라를 강화해 나갑니다.',
+              },
+            ].map((item, idx) => (
+              <motion.div
+                key={item.title}
+                className="rounded-2xl border border-black/5 bg-[#f9f5f2] px-5 py-4"
+                whileHover={{ y: -4 }}
+                transition={{ type: 'spring', stiffness: 220, damping: 18, delay: 0.05 * idx }}
               >
-                <p className="text-lg md:text-xl font-semibold">{news.title}</p>
-                <div className="mt-2 flex items-center gap-4 text-blue-600">
-                  <span className="font-bold">{news.src}</span>
-                  <span className="text-gray-700">{news.date}</span>
-                </div>
-              </a>
+                <h4 className="text-lg font-semibold text-gray-900">
+                  {item.title}
+                </h4>
+                <p className="mt-2 text-sm md:text-base text-gray-700 leading-relaxed">
+                  {item.desc}
+                </p>
+              </motion.div>
             ))}
-          </div> */}
+          </motion.div>
+        </div>
+      </motion.section>
 
-      {/* 기사 더보기 */}
-      {/* <div className="mt-6 flex items-center">
-            <a
-              href="#"
-              className="inline-flex items-center gap-2 text-base font-semibold hover:underline"
+      {/* ⑥ 전국 자활기업에 대한 내용 섹션 */}
+      <motion.section
+        className="relative z-10 bg-[#f9f5f2]"
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.25 }}
+        transition={{ duration: 0.7, ease: 'easeOut' }}
+      >
+        <div className="max-w-7xl mx-auto px-8 py-16">
+          <h3 className="text-2xl md:text-3xl font-extrabold text-gray-900">
+            전국 자활기업과 함께하는 파트너십
+          </h3>
+          <p className="mt-4 text-base md:text-lg text-gray-700 leading-relaxed">
+            한국클린쿱은 전국 곳곳에서 활동하는 <b>자활기업</b>과 함께합니다.
+            지역 주민이 스스로 일자리를 만들고, 돌봄과 청소 서비스를 제공하는
+            자활기업과의 협력은 단순한 하청 관계가 아니라
+            <b>상생을 위한 파트너십</b>입니다.
+            <br />
+            각 지역 자활센터·자활기업과 연계하여 경로당 청소, 공기청정기 관리,
+            주거환경 개선 사업을 함께 수행하며, 지역의 일자리와 복지를 동시에
+            키워가는 모델을 지향합니다.
+          </p>
+
+          <div className="mt-8 grid gap-6 md:grid-cols-3">
+            <motion.div
+              className="rounded-2xl bg-white border border-black/5 p-5"
+              variants={fadeIn}
+              transition={{ duration: 0.5, ease: 'easeOut', delay: 0.1 }}
+              whileHover={{ y: -4, scale: 1.01 }}
             >
-              기사 더보기
-              <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-black/40">
-                →
-              </span>
-            </a>
-          </div> */}
-      {/* </div>
-      </section> */}
+              <p className="text-sm font-semibold text-blue-700">
+                지역 기반 네트워크
+              </p>
+              <h4 className="mt-2 text-lg font-bold text-gray-900">
+                전국 자활기업 연계
+              </h4>
+              <p className="mt-2 text-sm md:text-base text-gray-700 leading-relaxed">
+                각 지역 자활기업의 인력과 노하우를 활용해,
+                한국클린쿱의 표준화된 청소 매뉴얼과 서비스 품질을
+                전국 단위로 확장할 수 있습니다.
+              </p>
+            </motion.div>
+
+            <motion.div
+              className="rounded-2xl bg-white border border-black/5 p-5"
+              variants={fadeIn}
+              transition={{ duration: 0.5, ease: 'easeOut', delay: 0.2 }}
+              whileHover={{ y: -4, scale: 1.01 }}
+            >
+              <p className="text-sm font-semibold text-blue-700">
+                공공·민간 프로젝트
+              </p>
+              <h4 className="mt-2 text-lg font-bold text-gray-900">
+                지자체·기관과의 공동 사업
+              </h4>
+              <p className="mt-2 text-sm md:text-base text-gray-700 leading-relaxed">
+                지자체 환경개선 사업, 복지관·경로당 청소 지원, 취약계층 주거환경 개선 등
+                공공사업을 자활기업과 함께 수행하여 지역 사회에 실질적인 변화를 만듭니다.
+              </p>
+            </motion.div>
+
+            <motion.div
+              className="rounded-2xl bg-white border border-black/5 p-5"
+              variants={fadeIn}
+              transition={{ duration: 0.5, ease: 'easeOut', delay: 0.3 }}
+              whileHover={{ y: -4, scale: 1.01 }}
+            >
+              <p className="text-sm font-semibold text-blue-700">
+                교육 · 성장
+              </p>
+              <h4 className="mt-2 text-lg font-bold text-gray-900">
+                전문 교육과 일자리 창출
+              </h4>
+              <p className="mt-2 text-sm md:text-base text-gray-700 leading-relaxed">
+                에어컨 종합세척, 방역·소독, 저장강박 특수청소 등
+                전문 교육 프로그램을 통해 자활기업 구성원이
+                <b>전문 청소 인력</b>으로 성장할 수 있도록 돕습니다.
+              </p>
+            </motion.div>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* 푸터 */}
       <Footer />
     </div>
   );

@@ -16,7 +16,7 @@ export default function Intro() {
         { label: '서비스 개요 소개', href: '/home/intro' },
         { label: '주요 서비스 지역', href: '/home/area' },
         { label: '연락처 및 위치', href: '/home/contact' },
-        { label: '간단한 성과 현황', href: '/home/achieve' },
+        { label: '성과 현황', href: '/home/achieve' },
         { label: '고객후기', href: '/home/review' },
     ];
     const [tab, setTab] = useState<string>('reserve');

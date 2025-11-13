@@ -1,7 +1,6 @@
 import { RowKey } from "@/hooks/usePricing";
 import { useQuery } from "@tanstack/react-query";
 export const baseUrl = 'http://3.36.49.217';
-// export const baseUrl = 'http://localhost:4500';
 export type MenuItem = {
     id?: string;
     label: string;
@@ -16,7 +15,7 @@ export const MENUS: MenuItem[] = [
             { id: 'home1', label: '서비스 개요 소개', href: '/home/intro' },
             { id: 'home2', label: '주요 서비스 지역', href: '/home/area' },
             { id: 'home3', label: '연락처 및 위치', href: '/home/contact' },
-            { id: 'home4', label: '간단한 성과 현황', href: '/home/achieve' },
+            { id: 'home4', label: '성과 현황', href: '/home/achieve' },
             { id: 'home5', label: '고객 후기', href: '/home/review' },
         ],
         href: '/home/intro'
@@ -28,7 +27,6 @@ export const MENUS: MenuItem[] = [
             { id: 'service1', label: '경로당 청소 서비스', href: '/service/clean' },
             { id: 'service2', label: '서비스 절차 안내', href: '/service/step' },
             { id: 'service3', label: '요금표', href: '/service/pricing' },
-            { id: 'service4', label: '서비스 지역', href: '/service/area' },
             { id: 'service5', label: '이용 안내', href: '/service/guide' },
             { id: 'service6', label: '품질 보증 정책', href: '/service/quality' },
         ],
@@ -170,11 +168,10 @@ export type SiteInfoDto = {
   updated_at: string | null;
 };
 export const LABELS: Record<RowKey, string> = {
-  totalCare: "토탈케어서비스",
-  generalCleaning: "대행청소",
-  disinfection: "소독방역",
-  acDeepClean: "에어컨종합세척",
-  etc: "기타",
+  airConditioner: "에어컨청소",
+  kitchen: "주방",
+  restroom: "화장실",
+  acDeepClean: "방역소독"
 };
 //카카오 api key
 export const appKey = 'c78ff6a6e87cf23cb658be44859dc5d1';
