@@ -25,7 +25,7 @@ const nextConfig: NextConfig = {
       // 개발/사내망 테스트가 필요하면 아래 두 줄을 남겨두고,
       // 운영 빌드에서는 가급적 제거하세요(보안/캐시 일관성).
       { protocol: "http", hostname: "localhost", port: "4500", pathname: "**" },
-      { protocol: "http", hostname: "back.koreaclean.kr", port: "80", pathname: "**" },
+      { protocol: "http", hostname: "back.koreacleancoop.kr", port: "80", pathname: "**" },
     ],
     // 필요 시 사이즈 튜닝
     deviceSizes: [360, 640, 768, 1024, 1280, 1536, 1920],
