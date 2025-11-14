@@ -54,14 +54,6 @@ export default function ThanksPage() {
                                     메인으로
                                 </Link>
                             </div>
-
-                            {/* (선택) 몇 초 후 자동 이동 문구 */}
-                            <p className="mt-6 text-center text-xs text-neutral-400">
-                                3초 후 자동으로 새 신청 화면으로 이동합니다…
-                            </p>
-
-                            {/* 자동 이동: 순수 HTML 메타리프레시 (JS 의존 X) */}
-                            <meta httpEquiv="refresh" content="3;url=/request" />
                         </div>
                     </main>
                 </div>
