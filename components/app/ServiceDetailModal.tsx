@@ -137,14 +137,14 @@ function normalizeEstimate(e: any): EstimateData {
   const num = (x: any) => (typeof x === "number" ? x : Number(x ?? 0)) || 0;
   const items = Array.isArray(e.items)
     ? e.items.map((it: any) => ({
-        name: String(it?.name ?? ""),
-        detail: it?.detail ? String(it.detail) : "",
-        qty: it?.qty != null ? Number(it.qty) : null,
-        unit: it?.unit ? String(it.unit) : "",
-        unit_price: it?.unit_price != null ? Number(it.unit_price) : null,
-        amount: num(it?.amount),
-        note: it?.note ? String(it.note) : "",
-      }))
+      name: String(it?.name ?? ""),
+      detail: it?.detail ? String(it.detail) : "",
+      qty: it?.qty != null ? Number(it.qty) : null,
+      unit: it?.unit ? String(it.unit) : "",
+      unit_price: it?.unit_price != null ? Number(it.unit_price) : null,
+      amount: num(it?.amount),
+      note: it?.note ? String(it.note) : "",
+    }))
     : [];
   return {
     title: e.title ?? "견적서",
@@ -233,7 +233,7 @@ export default function ServiceRequestDetailModal({
     [request]
   );
 
- 
+
 
   // 최신 배정 한 건
   const latestAss = pickLatestAssignment(request as any);
@@ -249,28 +249,28 @@ export default function ServiceRequestDetailModal({
   const est = normalizeEstimate((request as any)?.estimate);
 
   // 서비스 타입/기타 텍스트 파생값
-// ... 기존 훅들(useState/useEffect/useCompanies 등) 아래에 이어서 추가
-const serviceTypeList = useMemo<any[]>(() => {
-  const raw = (request as any)?.service_type;
-  return Array.isArray(raw) ? raw : [];
-}, [request]);
+  // ... 기존 훅들(useState/useEffect/useCompanies 등) 아래에 이어서 추가
+  const serviceTypeList = useMemo<any[]>(() => {
+    const raw = (request as any)?.service_type;
+    return Array.isArray(raw) ? raw : [];
+  }, [request]);
 
-const hasEtcType = useMemo(() => {
-  return serviceTypeList.some((t) => {
-    const v = typeof t === "string" ? t : (t?.type || t?.name || t?.label || "");
-    return String(v).trim() === "기타";
-  });
-}, [serviceTypeList]);
+  const hasEtcType = useMemo(() => {
+    return serviceTypeList.some((t) => {
+      const v = typeof t === "string" ? t : (t?.type || t?.name || t?.label || "");
+      return String(v).trim() === "기타";
+    });
+  }, [serviceTypeList]);
 
-const otherText: string = useMemo(() => {
-  return (
-    (request as any)?.service_types_other ??
-    (request as any)?.service_type_other ??
-    (request as any)?.other_service ??
-    ""
-  );
-}, [request]);
-   if (!open) return null;
+  const otherText: string = useMemo(() => {
+    return (
+      (request as any)?.service_types_other ??
+      (request as any)?.service_type_other ??
+      (request as any)?.other_service ??
+      ""
+    );
+  }, [request]);
+  if (!open) return null;
 
   const hasAnyEstimate =
     !!est?.supplier?.name ||
@@ -381,14 +381,16 @@ const otherText: string = useMemo(() => {
                         <table className="min-w-full table-fixed text-sm">
                           <colgroup>
                             <col className="w-[180px]" />
-                            <col />
-                            <col/>
+                            <col className="w-[120px]" /> {/* 작업일 */}
+                            <col />                        {/* 작업내역 */}
+                            <col className="w-[110px]" />  {/* 상태 */}
                           </colgroup>
                           <thead className="border-b bg-gray-50 text-gray-600">
                             <tr>
                               <th className="px-3 py-2 text-left font-semibold">경로당</th>
                               <th className="px-3 py-2 text-left font-semibold">작업일</th>
                               <th className="px-3 py-2 text-left font-semibold">작업내역</th>
+                              <th className="px-3 py-2 text-left font-semibold">상태</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y">
@@ -396,17 +398,26 @@ const otherText: string = useMemo(() => {
                               const key = s.id ?? i;
                               const workDate = s?.work_date;
                               const workText = s?.work;
+
+                              // seniors JSON에 status 또는 work_status 로 들어있다고 가정
+                              const statusRaw =
+                                (s?.status ?? s?.work_status ?? "WAIT").toString().toUpperCase();
+
                               return (
                                 <tr key={key} className="align-top hover:bg-gray-50/60">
                                   <td className="px-3 py-2">
                                     <div className="font-medium">{s.name}</div>
                                     <div className="mt-1 text-xs text-gray-500">{s.address || "-"}</div>
                                   </td>
-                                  <td className="px-3 py-2">{workDate}</td>
-                                  <td className="px-3 py-2">{workText}</td>
+                                  <td className="px-3 py-2">{workDate || "-"}</td>
+                                  <td className="px-3 py-2 whitespace-pre-wrap">{workText || "-"}</td>
+                                  <td className="px-3 py-2">
+                                    <SeniorStatusBadge value={statusRaw} />
+                                  </td>
                                 </tr>
                               );
                             })}
+
                           </tbody>
                         </table>
                       </div>
@@ -524,10 +535,10 @@ const otherText: string = useMemo(() => {
                 {/* ✅ 견적서 (읽기 전용 표시) */}
                 {/* ======================= */}
                 <EstimateViewer
-  estimate={(request as any)?.estimate}
-  requestId={(request as any)?.id}
-  downloadEndpoint={`/backend/request/${(request as any)?.id}/estimate/preview`}
-/>
+                  estimate={(request as any)?.estimate}
+                  requestId={(request as any)?.id}
+                  downloadEndpoint={`/backend/request/${(request as any)?.id}/estimate/preview`}
+                />
 
                 {/* === /견적서 === */}
               </section>
@@ -769,5 +780,31 @@ function PartyReadOnlyCard({ title, p }: { title: string; p?: PartyInfo }) {
         <Row k="주소" v={v.address} />
       </div>
     </div>
+  );
+}
+
+function SeniorStatusBadge({ value }: { value?: string }) {
+  const v = (value || "WAIT").toString().toUpperCase();
+
+  const labelMap: Record<string, string> = {
+    WAIT: "대기",
+    IN_PROGRESS: "진행중",
+    DONE: "완료",
+  };
+  const styleMap: Record<string, string> = {
+    WAIT: "bg-gray-50 text-gray-700 ring-gray-200",
+    IN_PROGRESS: "bg-blue-50 text-blue-700 ring-blue-200",
+    DONE: "bg-emerald-50 text-emerald-700 ring-emerald-200",
+  };
+
+  const label = labelMap[v] || v;
+  const cls = styleMap[v] || "bg-gray-50 text-gray-700 ring-gray-200";
+
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ring-1 ${cls}`}
+    >
+      {label}
+    </span>
   );
 }

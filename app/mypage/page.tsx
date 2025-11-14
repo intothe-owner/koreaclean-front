@@ -198,62 +198,6 @@ export default function MyPage() {
             <p className="mt-1 text-neutral-600">{subtitle}</p>
           </div>
 
-          {/* 자활기업 전용: 승인된 업체 선택 영역 */}
-          {isCompany && (
-            <div className="mb-6 rounded-2xl border border-black/10 bg-white p-4 shadow-sm">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-center gap-3">
-                  <label className="text-sm font-medium text-neutral-800">
-                    소속 업체 선택
-                  </label>
-
-                  <select
-                    value={selectedCompany?.id ?? ''}
-                    onChange={(e) => {
-                      const id = Number(e.target.value);
-                      const c = companies.find((x) => x.id === id);
-                      if (c) {
-                        const comp = { id: c.id, name: c.name };
-                        setSelectedCompany(comp);
-                        localStorage.setItem('selected_company', JSON.stringify(comp));
-                      } else {
-                        setSelectedCompany(null);
-                        localStorage.removeItem('selected_company');
-                      }
-                    }}
-                    disabled={companyLoading}
-                    className="h-10 min-w-[260px] rounded-lg border border-neutral-300 bg-white px-3 pr-9 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  >
-                    <option value="" disabled>
-                      {companyLoading
-                        ? '업체 불러오는 중…'
-                        : companyError
-                        ? '업체 불러오기 실패'
-                        : companies.length
-                        ? '업체를 선택하세요'
-                        : '승인된 업체가 없습니다'}
-                    </option>
-                    {companies.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="text-sm text-neutral-700">
-                  {selectedCompany ? (
-                    <>
-                      선택된 업체: <b>{selectedCompany.name}</b>{' '}
-                      <span className="text-neutral-400">(ID: {selectedCompany.id})</span>
-                    </>
-                  ) : (
-                    <span className="text-neutral-500">아직 업체가 선택되지 않았습니다.</span>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* 메뉴 또는 안내 */}
           {menus.length > 0 ? (

@@ -173,5 +173,20 @@ export const LABELS: Record<RowKey, string> = {
   restroom: "화장실",
   acDeepClean: "방역소독"
 };
+
+export type SeniorWorkRow = {
+  id?: number;
+  name: string;
+  address?: string;
+  work_date?: string;
+  work?: string;
+  status?: string; // 'WAIT' | 'IN_PROGRESS' | 'DONE' 등
+};
+
+export const seniorStatusLabel: Record<string, string> = {
+  WAIT: "대기",
+  IN_PROGRESS: "진행중",
+  DONE: "완료",
+};
 //카카오 api key
 export const appKey = 'c78ff6a6e87cf23cb658be44859dc5d1';

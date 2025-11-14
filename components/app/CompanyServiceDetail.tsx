@@ -2,10 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { baseUrl, RequestForm } from "@/lib/variable";
+import { baseUrl, RequestForm, seniorStatusLabel, SeniorWorkRow } from "@/lib/variable";
 import { type SRStatus } from "@/hooks/useServiceRequests";
 import { fetchWithAuth } from "@/lib/fetchWitgAuth";
-
+import EstimateViewer from "./EstimateViewer";
+import { getSeniorRows } from "@/lib/function";
 /* ============================================================
  * 저장 / 미리보기 훅
  * ============================================================ */
@@ -64,6 +65,36 @@ function usePreviewEstimate() {
       }
 
       return await res.blob(); // 성공 시 PDF blob
+    },
+  });
+}
+//경로당 날짜 상태 저장하기
+function useSaveSeniorWorks() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (params: {
+      requestId: number;
+      seniors: SeniorWorkRow[];
+    }) => {
+      const { requestId, seniors } = params;
+
+      // 👉 백엔드에 맞게 엔드포인트만 조정하세요.
+      const res = await fetchWithAuth(
+        `${baseUrl}/request/${requestId}/seniors-json`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ seniors }),
+        }
+      );
+      if (!res.ok) throw new Error("경로당 작업 정보 저장 실패");
+      return res.json();
+    },
+    onSuccess: () => {
+      // 서비스 신청 목록/상세 다시 불러오기
+      qc.invalidateQueries({ queryKey: ["service-requests"] });
     },
   });
 }
@@ -189,7 +220,24 @@ export default function CompanyServiceDetail({
     () => (request as any)?.created_at || (request as any)?.createdAt || "-",
     [request]
   );
-
+  const serviceTypeList = useMemo<any[]>(() => {
+    const raw = (request as any)?.service_type;
+    return Array.isArray(raw) ? raw : [];
+  }, [request]);
+  const hasEtcType = useMemo(() => {
+    return serviceTypeList.some((t) => {
+      const v = typeof t === "string" ? t : (t?.type || t?.name || t?.label || "");
+      return String(v).trim() === "기타";
+    });
+  }, [serviceTypeList]);
+  const otherText: string = useMemo(() => {
+    return (
+      (request as any)?.service_types_other ??
+      (request as any)?.service_type_other ??
+      (request as any)?.other_service ??
+      ""
+    );
+  }, [request]);
   if (!open) return null;
 
   return (
@@ -255,7 +303,60 @@ export default function CompanyServiceDetail({
                 <Field label="희망일" value={request.hope_date || "-"} />
                 <Field label="특이사항" value={request.etc || "-"} multiline />
               </section>
-
+              <section className="grid grid-cols-1 gap-4">
+                              {/* 서비스 타입: 칩 나열 */}
+                              <div>
+                                <div className="mb-1 text-xs text-gray-500">서비스 종류</div>
+                                <div className="flex flex-wrap gap-1">
+                                  {Array.isArray(request?.service_type) && (request!.service_type as any[]).length > 0 ? (
+                                    (request!.service_type as any[]).map((t: any, i: number) => (
+                                      <span
+                                        key={i}
+                                        className="rounded-full bg-gray-50 px-2 py-0.5 text-xs ring-1 ring-gray-200"
+                                      >
+                                        {typeof t === "string"
+                                          ? t
+                                          : t?.type || t?.name || t?.label || "-"}
+                                      </span>
+                                    ))
+                                  ) : (
+                                    <span className="text-sm text-gray-500">-</span>
+                                  )}
+                                </div>
+              
+                                {/* ⬇⬇⬇ 추가: 기타 상세 표시 ⬇⬇⬇ */}
+                                {(hasEtcType || otherText?.trim()) && (
+                                  <div className="mt-2 text-xs">
+              
+                                    <span className="align-middle text-gray-800">
+                                      {otherText?.trim() || "-"}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+              
+                              {/* 경로당 목록 */}
+                              <SeniorTableEditor request={request} />
+              
+                              
+              
+                              {/* 특이사항 */}
+                              <Field label="특이사항" value={request.etc || "-"} multiline />
+              
+                              {/* 첨부파일: 다운로드/미리보기 지원 */}
+                              {!!request?.files && <FilesList label="첨부파일" files={request.files} />}
+              
+                              {/* ======================= */}
+                              {/* ✅ 견적서 (읽기 전용 표시) */}
+                              {/* ======================= */}
+                              <EstimateViewer
+                                estimate={(request as any)?.estimate}
+                                requestId={(request as any)?.id}
+                                downloadEndpoint={`/backend/request/${(request as any)?.id}/estimate/preview`}
+                              />
+              
+                              {/* === /견적서 === */}
+                            </section>
               <hr className="border-gray-200" />
 
               {/* ✅ 견적 쓰기 섹션 */}
@@ -1079,6 +1180,324 @@ function PartyCard({
             onChange={(v) => onChange({ ...value, address: v })}
           />
         </div>
+      </div>
+    </div>
+  );
+}
+function FilesList({ label, files }: { label: string; files: any }) {
+  const items = parseFiles(files);
+
+  if (!items.length) {
+    return <Field label={label} value="-" />;
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="text-xs text-gray-500">{label}</div>
+      <ul className="divide-y rounded-lg border border-gray-200">
+        {items.map((f, i) => {
+          const fileName = inferName(f);
+          const href = toAbsoluteUrl(f.url || f.path || "");
+          const sizeText = typeof f.size === "number" ? ` · ${formatBytes(f.size)}` : "";
+          const isPreviewable = isPreviewMime(f.type || f.mime || "");
+
+          return (
+            <li key={(f.id as any) ?? `${fileName}-${i}`} className="flex items-center justify-between gap-3 p-3">
+              <div className="min-w-0">
+                <div className="truncate text-sm font-medium text-gray-900">{fileName}</div>
+                <div className="mt-0.5 text-xs text-gray-500">
+                  {(f.type || f.mime || "파일")}{sizeText}
+                </div>
+              </div>
+
+              <div className="shrink-0 flex items-center gap-2">
+                {/* 미리보기(가능한 포맷만) */}
+                {href && isPreviewable && (
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-lg border border-gray-300 px-2.5 py-1.5 text-xs hover:bg-gray-50"
+                    title="새 창에서 미리보기"
+                  >
+                    미리보기
+                  </a>
+                )}
+
+                {/* 다운로드(인증 쿠키 포함) */}
+                <button
+                  onClick={() => downloadFile(f)}
+                  className="rounded-lg bg-blue-600 px-2.5 py-1.5 text-xs text-white hover:bg-blue-700"
+                  title="파일 다운로드"
+                >
+                  다운로드
+                </button>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+/* ------------------------------ */
+/* 첨부파일 리스트 + 다운로드 지원 */
+/* ------------------------------ */
+
+type FileLike = {
+  id?: string | number;
+  url?: string;
+  path?: string;
+  name?: string;
+  originalName?: string;
+  filename?: string;
+  fileName?: string;
+  type?: string;
+  mime?: string;
+  size?: number;
+};
+function parseFiles(v: any): FileLike[] {
+  try {
+    const arr = Array.isArray(v) ? v : typeof v === "string" ? JSON.parse(v) : [];
+    if (!Array.isArray(arr)) return [];
+    return arr
+      .map((x) => (typeof x === "string" ? { url: x } : x))
+      .filter((x) => x?.url || x?.path);
+  } catch {
+    return [];
+  }
+}
+
+function inferName(f: FileLike): string {
+  return (
+    f.originalName ||
+    f.name ||
+    f.filename ||
+    f.fileName ||
+    (f.url ? decodeURIComponent(f.url.split("/").pop() || "") : "") ||
+    (f.path ? decodeURIComponent(f.path.split("/").pop() || "") : "") ||
+    "파일"
+  );
+}
+
+function toAbsoluteUrl(url: string): string {
+  if (!url) return "";
+  try {
+    // 절대경로면 그대로, 상대경로면 현재 origin 기준으로 변환
+    return new URL(url, window.location.origin).toString();
+  } catch {
+    return url;
+  }
+}
+
+function isPreviewMime(mime: string): boolean {
+  const m = mime.toLowerCase();
+  return (
+    m.startsWith("image/") ||
+    m === "application/pdf" ||
+    m.startsWith("text/")
+  );
+}
+
+function formatBytes(bytes: number): string {
+  if (bytes === 0) return "0 B";
+  const k = 1024;
+  const units = ["B", "KB", "MB", "GB", "TB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${(bytes / Math.pow(k, i)).toFixed(1)} ${units[i]}`;
+}
+
+/**
+ * 인증이 필요한 파일도 안전하게 받기 위해 fetch + Blob으로 다운로드
+ * (서버가 쿠키 인증을 쓸 경우 credentials: 'include' 필요)
+ */
+async function downloadFile(f: FileLike) {
+  const href = toAbsoluteUrl(f.url || f.path || "");
+  if (!href) return;
+
+  const res = await fetchWithAuth(href, { credentials: "include" });
+  if (!res.ok) {
+    alert("파일 다운로드에 실패했습니다.");
+    return;
+  }
+  const blob = await res.blob();
+
+  // 파일명: Content-Disposition > 메타필드 > URL 추론
+  let filename = inferName(f);
+  const cd = res.headers.get("Content-Disposition") || res.headers.get("content-disposition");
+  if (cd) {
+    const m = /filename\*?=(?:UTF-8'')?["']?([^"';]+)["']?/i.exec(cd);
+    if (m?.[1]) filename = decodeURIComponent(m[1]);
+  }
+
+  const dlUrl = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = dlUrl;
+  a.download = filename || "download";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(dlUrl);
+}
+
+
+
+
+/* ============================================================
+ * 경로당 작업일·작업내역·상태 편집 테이블
+ * ============================================================ */
+function SeniorTableEditor({ request }: { request: RequestForm }) {
+  const requestId = (request as any)?.id;
+  const [rows, setRows] = useState<SeniorWorkRow[]>([]);
+  const { mutateAsync: saveSeniorWorks, isPending } = useSaveSeniorWorks();
+
+  // 최초 로딩 + request 변경 시 경로당 행 세팅
+  useEffect(() => {
+    const baseRows =
+      getSeniorRows(
+        (request as any)?.seniors ?? (request as any)?.seniorInfo
+      ) || [];
+
+    const normalized = baseRows.map((s: any, idx: number) => ({
+      id: s.id ?? idx,
+      name: String(s.name ?? ""),
+      address: s.address ?? "",
+      // 날짜는 YYYY-MM-DD까지만 사용
+      work_date: s.work_date ? String(s.work_date).slice(0, 10) : "",
+      work: s.work ?? "",
+      status: s.status || s.work_status || "WAIT", // 기본값 대기
+    }));
+
+    setRows(normalized);
+  }, [request]);
+
+  const handleChangeRow = (
+    index: number,
+    patch: Partial<SeniorWorkRow>
+  ) => {
+    setRows((prev) =>
+      prev.map((row, i) => (i === index ? { ...row, ...patch } : row))
+    );
+  };
+
+  const handleSave = async () => {
+    if (!requestId) {
+      alert("요청 ID가 없습니다.");
+      return;
+    }
+    try {
+      await saveSeniorWorks({
+        requestId: Number(requestId),
+        seniors: rows,
+      });
+      alert("경로당 작업 정보가 저장되었습니다.");
+    } catch (e: any) {
+      alert(e?.message || "경로당 작업 정보 저장 중 오류가 발생했습니다.");
+    }
+  };
+
+  if (!rows.length) {
+    return (
+      <div>
+        <div className="mb-1 flex items-center justify-between text-xs text-gray-500">
+          <span>경로당 목록</span>
+        </div>
+        <div className="text-sm text-gray-500">-</div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="mb-1 flex items-center justify-between text-xs text-gray-500">
+        <span>경로당 목록</span>
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={isPending}
+          className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-60"
+        >
+          {isPending ? "저장 중…" : "작업 정보 저장"}
+        </button>
+      </div>
+
+      <div className="overflow-x-auto rounded-lg border border-gray-200">
+        <table className="min-w-full table-fixed text-sm">
+          <colgroup>
+            <col className="w-[180px]" />
+            <col className="w-[120px]" />
+            <col />
+            <col className="w-[120px]" />
+          </colgroup>
+          <thead className="border-b bg-gray-50 text-gray-600">
+            <tr>
+              <th className="px-3 py-2 text-left font-semibold">경로당</th>
+              <th className="px-3 py-2 text-left font-semibold">작업일</th>
+              <th className="px-3 py-2 text-left font-semibold">작업내역</th>
+              <th className="px-3 py-2 text-left font-semibold">상태</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y">
+            {rows.map((row, i) => (
+              <tr
+                key={row.id ?? i}
+                className="align-top hover:bg-gray-50/60"
+              >
+                {/* 경로당 이름/주소 (읽기 전용) */}
+                <td className="px-3 py-2">
+                  <div className="font-medium">{row.name}</div>
+                  <div className="mt-1 text-xs text-gray-500">
+                    {row.address || "-"}
+                  </div>
+                </td>
+
+                {/* 작업일 입력 */}
+                <td className="px-3 py-2 align-middle">
+                  <input
+                    type="date"
+                    className="w-full rounded border border-gray-200 px-2 py-1 text-xs"
+                    value={row.work_date || ""}
+                    onChange={(e) =>
+                      handleChangeRow(i, { work_date: e.target.value })
+                    }
+                  />
+                </td>
+
+                {/* 작업내역 입력 */}
+                <td className="px-3 py-2">
+                  <textarea
+                    className="w-full resize-y rounded border border-gray-200 px-2 py-1 text-xs"
+                    rows={2}
+                    value={row.work || ""}
+                    placeholder="예) 에어컨 실내기 분해세척, 실외기 고압세척 등"
+                    onChange={(e) =>
+                      handleChangeRow(i, { work: e.target.value })
+                    }
+                  />
+                </td>
+
+                {/* 상태 변경 셀렉트 */}
+                <td className="px-3 py-2 align-middle">
+                  <select
+                    className="w-full rounded border border-gray-200 px-2 py-1 text-xs"
+                    value={row.status || "WAIT"}
+                    onChange={(e) =>
+                      handleChangeRow(i, { status: e.target.value })
+                    }
+                  >
+                    {Object.entries(seniorStatusLabel).map(
+                      ([value, label]) => (
+                        <option key={value} value={value}>
+                          {label}
+                        </option>
+                      )
+                    )}
+                  </select>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

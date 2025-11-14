@@ -248,37 +248,43 @@ export default function ServiceRequestDetailModal({
                         <table className="min-w-full table-fixed text-sm">
                           <colgroup>
                             <col className="w-[180px]" />
-                            <col />
-                            <col />
+                            <col className="w-[120px]" /> {/* 작업일 */}
+                            <col />                        {/* 작업내역 */}
+                            <col className="w-[110px]" />  {/* 상태 */}
                           </colgroup>
                           <thead className="border-b bg-gray-50 text-gray-600">
                             <tr>
                               <th className="px-3 py-2 text-left font-semibold">경로당</th>
                               <th className="px-3 py-2 text-left font-semibold">작업일</th>
                               <th className="px-3 py-2 text-left font-semibold">작업내역</th>
+                              <th className="px-3 py-2 text-left font-semibold">상태</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y">
                             {rows.map((s: any, i: number) => {
                               const key = s.id ?? i;
-
                               const workDate = s?.work_date;
                               const workText = s?.work;
+
+                              // seniors JSON에 status 또는 work_status 로 들어있다고 가정
+                              const statusRaw =
+                                (s?.status ?? s?.work_status ?? "WAIT").toString().toUpperCase();
+
                               return (
                                 <tr key={key} className="align-top hover:bg-gray-50/60">
                                   <td className="px-3 py-2">
                                     <div className="font-medium">{s.name}</div>
                                     <div className="mt-1 text-xs text-gray-500">{s.address || "-"}</div>
                                   </td>
+                                  <td className="px-3 py-2">{workDate || "-"}</td>
+                                  <td className="px-3 py-2 whitespace-pre-wrap">{workText || "-"}</td>
                                   <td className="px-3 py-2">
-                                    {workDate}
-                                  </td>
-                                  <td className="px-3 py-2">
-                                    {workText}
+                                    <SeniorStatusBadge value={statusRaw} />
                                   </td>
                                 </tr>
                               );
                             })}
+
                           </tbody>
                         </table>
                       </div>
@@ -599,4 +605,30 @@ async function downloadFile(f: FileLike) {
   a.click();
   a.remove();
   URL.revokeObjectURL(dlUrl);
+}
+
+function SeniorStatusBadge({ value }: { value?: string }) {
+  const v = (value || "WAIT").toString().toUpperCase();
+
+  const labelMap: Record<string, string> = {
+    WAIT: "대기",
+    IN_PROGRESS: "진행중",
+    DONE: "완료",
+  };
+  const styleMap: Record<string, string> = {
+    WAIT: "bg-gray-50 text-gray-700 ring-gray-200",
+    IN_PROGRESS: "bg-blue-50 text-blue-700 ring-blue-200",
+    DONE: "bg-emerald-50 text-emerald-700 ring-emerald-200",
+  };
+
+  const label = labelMap[v] || v;
+  const cls = styleMap[v] || "bg-gray-50 text-gray-700 ring-gray-200";
+
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ring-1 ${cls}`}
+    >
+      {label}
+    </span>
+  );
 }
