@@ -1,6 +1,6 @@
 import { RowKey } from "@/hooks/usePricing";
 import { useQuery } from "@tanstack/react-query";
-export const baseUrl = 'http://back.koreacoop.kr';
+export const baseUrl = 'http://back.koreaclean.kr';
 export type MenuItem = {
     id?: string;
     label: string;

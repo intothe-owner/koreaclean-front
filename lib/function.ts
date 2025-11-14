@@ -119,7 +119,7 @@ export async function generateMetadata() {
 // lib/server/site.ts
 export async function fetchSiteInfoForMeta() {
   // 절대 URL 확보
-  const base = "http://back.koreacoop.kr";
+  const base = "http://back.koreaclean.kr";
 
   const res = await fetchWithAuth(`${base}/site/detail`, {
     cache: "no-store", // 항상 최신 (원하면 revalidate로 바꿔도 됨)
