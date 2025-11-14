@@ -80,8 +80,9 @@ export function getSeniorRows(input: any): Array<{ id?: number; name: string; ad
       const lng = (v.lng ?? v.lng ?? v.lng ?? 0).toString().trim();
       const work_date = (v.work_date ?? v.work_date ?? v.work_date ?? '').toString().trim();
       const work = (v.work ?? v.work ?? v.work ?? '').toString().trim();
+      const status = (v.status ?? v.status ?? v.status ?? '').toString().trim();
       if (!name) return null;
-      return { id: v.id, name, address,lat,lng,work_date,work };
+      return { id: v.id, name, address,lat,lng,work_date,work,status };
     })
     .filter(Boolean) as Array<{ id?: number; name: string; address?: string }>;
 }
