@@ -6,7 +6,7 @@ let _socket: Socket | null = null;
 function pickBaseURL() {
   if (typeof window === "undefined") return "/";
   //return "http://113.131.151.103:4500"; // 백엔드 직접 접속
-  return "http://3.36.49.217"; // 백엔드 직접 접속
+  return "http://back.koreacoop.kr"; // 백엔드 직접 접속
 }
 
 function getAccessToken(): string | undefined {
