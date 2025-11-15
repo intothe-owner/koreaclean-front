@@ -1,7 +1,7 @@
 // app/admin/service/page.tsx
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Header from "@/components/admin/Header";
 import Sidebar from "@/components/admin/Siderbar";
 
@@ -51,7 +51,8 @@ function numberToKoreanMoney(n: number): string {
 }
 
 export default function PricingPage() {
-
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+      const toggleSidebar = () => setSidebarOpen((prev) => !prev);
 
   // ✅ 훅 사용 (마운트 시 자동으로 /admin/site/pricing 불러옴)
   const { raw, setField, save, loading, saving, error } = usePricing({
@@ -74,9 +75,13 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen w-full bg-gray-50 text-gray-900">
-      <Sidebar />
+      {/* Sidebar */}
+      <Sidebar sidebarOpen={sidebarOpen} />
+
+      {/* Main area */}
       <div className="lg:pl-72">
-        <Header />
+        {/* Topbar */}
+        <Header sidebarOpen={sidebarOpen} onToggleSidebar={toggleSidebar} />
         <main className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <h1 className="text-xl font-bold">홈페이지 관리 &gt;&gt; 요금표 설정</h1>

@@ -50,6 +50,7 @@ function fmt(v?: string | null) {
 
 export default function QnaListPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+    const toggleSidebar = () => setSidebarOpen((prev) => !prev);
 
 
 
@@ -127,10 +128,13 @@ export default function QnaListPage() {
         />
       )}
 
-      <Sidebar />
+      {/* Sidebar */}
+      <Sidebar sidebarOpen={sidebarOpen} />
 
+      {/* Main area */}
       <div className="lg:pl-72">
-        <Header />
+        {/* Topbar */}
+        <Header sidebarOpen={sidebarOpen} onToggleSidebar={toggleSidebar} />
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

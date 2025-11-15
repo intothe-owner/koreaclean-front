@@ -12,8 +12,9 @@ import AdminCompanyListUI from "@/components/admin/AdminCompanyList";
 
 export default function CompanyPage() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const toggleSidebar = () => setSidebarOpen((prev) => !prev);
 
-    
+
 
 
     return (
@@ -21,12 +22,16 @@ export default function CompanyPage() {
             {/* Mobile overlay */}
             {sidebarOpen && <div className="fixed inset-0 z-30 bg-black/30 lg:hidden" onClick={() => setSidebarOpen(false)} />}
 
-            <Sidebar />
+            {/* Sidebar */}
+            <Sidebar sidebarOpen={sidebarOpen} />
+
+            {/* Main area */}
             <div className="lg:pl-72">
-                <Header />
+                {/* Topbar */}
+                <Header sidebarOpen={sidebarOpen} onToggleSidebar={toggleSidebar} />
 
                 <main className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
-                <AdminCompanyListUI/>
+                    <AdminCompanyListUI />
                 </main>
             </div>
         </div>

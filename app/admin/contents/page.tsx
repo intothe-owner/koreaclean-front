@@ -167,6 +167,7 @@ function HtmlEditorModal({
 // 3) 관리자 목록 + 에디터 연결
 export default function AdminContents() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const toggleSidebar = () => setSidebarOpen((prev) => !prev);
 
 
     // 편집 모달 상태
@@ -206,11 +207,13 @@ export default function AdminContents() {
                 />
             )}
 
-            <Sidebar />
+            {/* Sidebar */}
+            <Sidebar sidebarOpen={sidebarOpen} />
 
             {/* Main area */}
             <div className="lg:pl-72">
-                <Header />
+                {/* Topbar */}
+                <Header sidebarOpen={sidebarOpen} onToggleSidebar={toggleSidebar} />
 
                 {/* Content */}
                 <main className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">

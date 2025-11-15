@@ -1,7 +1,7 @@
 // app/admin/service/page.tsx
 "use client";
 
-import React, { Suspense } from "react";
+import React, { Suspense, useState } from "react";
 import Header from "@/components/admin/Header";
 import Sidebar from "@/components/admin/Siderbar";
 import { useSearchParams } from "next/navigation";
@@ -16,6 +16,8 @@ export default function NoticeFormPage() {
 }
 
 const NoticeForm = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+      const toggleSidebar = () => setSidebarOpen((prev) => !prev);
   const sp = useSearchParams();
   const id = sp.get("id");
   const {
@@ -37,9 +39,13 @@ const NoticeForm = () => {
 
   return (
     <div className="min-h-screen w-full bg-gray-50 text-gray-900">
-      <Sidebar />
+      {/* Sidebar */}
+      <Sidebar sidebarOpen={sidebarOpen} />
+
+      {/* Main area */}
       <div className="lg:pl-72">
-        <Header />
+        {/* Topbar */}
+        <Header sidebarOpen={sidebarOpen} onToggleSidebar={toggleSidebar} />
 
         <main className="mx-auto max-w-7xl space-y-6 px-3 py-6 sm:px-4 md:px-6 lg:px-8">
           {/* 타이틀/액션 */}

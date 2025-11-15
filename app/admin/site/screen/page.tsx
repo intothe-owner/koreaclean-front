@@ -1,7 +1,7 @@
 // app/admin/service/page.tsx
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import Header from "@/components/admin/Header";
 import Sidebar from "@/components/admin/Siderbar";
 import FileUpload from "@/components/ui/FileUpload";
@@ -85,7 +85,8 @@ export default function ScreenSetPage() {
     defaultFont: FONT_OPTIONS[0].value,
   });
 
-  const sidebarOpen = false; // 레이아웃에서 쓰던 값 고정
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const toggleSidebar = () => setSidebarOpen((prev) => !prev);
 
   const onSave = save;
   const onReload = reload;
@@ -100,9 +101,13 @@ export default function ScreenSetPage() {
 
   return (
     <div className="min-h-screen w-full bg-gray-50 text-gray-900">
-      <Sidebar />
+      {/* Sidebar */}
+      <Sidebar sidebarOpen={sidebarOpen} />
+
+      {/* Main area */}
       <div className="lg:pl-72">
-        <Header />
+        {/* Topbar */}
+        <Header sidebarOpen={sidebarOpen} onToggleSidebar={toggleSidebar} />
 
         <main className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">

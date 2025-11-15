@@ -74,6 +74,7 @@ export default function UserPage() {
     const [detailOpen, setDetailOpen] = useState(false);
     const [detailUser, setDetailUser] = useState<UserRow | null>(null);
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const toggleSidebar = () => setSidebarOpen((prev) => !prev);
     const [emailModalOpen, setEmailModalOpen] = useState(false);
     const [emailMode, setEmailMode] = useState<EmailMode>("ALL");
     // 검색/필터/정렬/페이지 상태
@@ -252,10 +253,10 @@ export default function UserPage() {
         <div className="min-h-screen w-full bg-gray-50 text-gray-900">
             {sidebarOpen && <div className="fixed inset-0 z-30 bg-black/40 lg:hidden" onClick={() => setSidebarOpen(false)} />}
 
-            <Sidebar />
+            <Sidebar sidebarOpen={sidebarOpen} />
 
             <div className="lg:pl-72">
-                <Header />
+                <Header sidebarOpen={sidebarOpen} onToggleSidebar={toggleSidebar} />
 
                 <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

@@ -83,6 +83,7 @@ const initialForm: FormState = {
 /** 페이지 컴포넌트 */
 export default function SiteBasiInfoPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+    const toggleSidebar = () => setSidebarOpen((prev) => !prev);
 
 
 
@@ -97,9 +98,13 @@ export default function SiteBasiInfoPage() {
         />
       )}
 
-      <Sidebar />
+      {/* Sidebar */}
+      <Sidebar sidebarOpen={sidebarOpen} />
+
+      {/* Main area */}
       <div className="lg:pl-72">
-        <Header />
+        {/* Topbar */}
+        <Header sidebarOpen={sidebarOpen} onToggleSidebar={toggleSidebar} />
 
         <main className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
           <h1 className="mb-2 text-xl font-bold">홈페이지 관리 &gt;&gt; 사이트 기본정보</h1>

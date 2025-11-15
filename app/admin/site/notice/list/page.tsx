@@ -37,7 +37,8 @@ const PRIORITY_LABEL: Record<PriorityCode, string> = {
 /* ----------------- 목록 컴포넌트 ----------------- */
 function NoticeListAuthed() {
   const router = useRouter();
-
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+    const toggleSidebar = () => setSidebarOpen((prev) => !prev);
   // 목록 파라미터 상태 (노출/작성자 제거)
   const [q, setQ] = useState("");
   const [priority, setPriority] = useState<"" | PriorityCode>(""); // 전체 = ""
@@ -97,9 +98,13 @@ function NoticeListAuthed() {
 
   return (
     <div className="min-h-screen w-full bg-gray-50 text-gray-900">
-      <Sidebar />
+      {/* Sidebar */}
+      <Sidebar sidebarOpen={sidebarOpen} />
+
+      {/* Main area */}
       <div className="lg:pl-72">
-        <Header />
+        {/* Topbar */}
+        <Header sidebarOpen={sidebarOpen} onToggleSidebar={toggleSidebar} />
 
         <main className="mx-auto max-w-7xl space-y-6 px-3 py-6 sm:px-4 md:px-6 lg:px-8">
           {/* 헤더 */}

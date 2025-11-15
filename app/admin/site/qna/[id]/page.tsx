@@ -90,7 +90,8 @@ export default function AdminQnaDetailPage() {
 
 
     const params = useParams<{ id: string }>();
-
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const toggleSidebar = () => setSidebarOpen((prev) => !prev);
 
     const [item, setItem] = useState<AdminQnaDetail | null>(null);
     const [comments, setComments] = useState<QnaComment[]>([]);
@@ -107,7 +108,7 @@ export default function AdminQnaDetailPage() {
             // 관리자도 공용 상세 엔드포인트 사용 (권한은 서버에서 검사)
             const res = await fetchWithAuth(`/backend/qna/detail/${params.id}`, {
                 method: "GET",
-               
+
                 credentials: "include",
             });
             if (!res.ok) throw new Error(await res.text());
@@ -122,7 +123,7 @@ export default function AdminQnaDetailPage() {
     }
 
     useEffect(() => {
-         load();
+        load();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [params?.id]);
 
@@ -159,7 +160,7 @@ export default function AdminQnaDetailPage() {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                   
+
                 },
                 credentials: "include",
                 body: JSON.stringify({ post_id: item.id }),
@@ -183,7 +184,7 @@ export default function AdminQnaDetailPage() {
             setDeletingId(id);
             const res = await fetchWithAuth(`/backend/qna/comment/${id}`, {
                 method: "DELETE",
-               
+
                 credentials: "include",
             });
             if (!res.ok) throw new Error(await res.text());
@@ -200,9 +201,13 @@ export default function AdminQnaDetailPage() {
 
     return (
         <div className="min-h-screen w-full bg-gray-50 text-gray-900">
-            <Sidebar />
+            {/* Sidebar */}
+            <Sidebar sidebarOpen={sidebarOpen} />
+
+            {/* Main area */}
             <div className="lg:pl-72">
-                <Header />
+                {/* Topbar */}
+                <Header sidebarOpen={sidebarOpen} onToggleSidebar={toggleSidebar} />
 
                 <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                     <div className="rounded-2xl bg-white p-5 md:p-6 shadow-sm border border-black/10">

@@ -164,6 +164,7 @@ function RequestRowCard({
 export default function ServiceRequestListPage() {
   const { data: session, status } = useSession();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+    const toggleSidebar = () => setSidebarOpen((prev) => !prev);
 
   const [detailOpen, setDetailOpen] = useState<boolean>(false);
   const [selected, setSelected] = useState<RequestForm | null>(null);
@@ -294,9 +295,13 @@ export default function ServiceRequestListPage() {
         />
       )}
 
-      <Sidebar />
+      {/* Sidebar */}
+      <Sidebar sidebarOpen={sidebarOpen} />
+
+      {/* Main area */}
       <div className="lg:pl-72">
-        <Header />
+        {/* Topbar */}
+        <Header sidebarOpen={sidebarOpen} onToggleSidebar={toggleSidebar} />
 
         <main className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
           <h1 className="mb-2 text-xl font-bold">서비스 신청 관리</h1>

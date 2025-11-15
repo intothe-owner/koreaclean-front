@@ -40,7 +40,8 @@ const API_BASE = "/api/faq";
 
 export default function FaqPage() {
 
-
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+    const toggleSidebar = () => setSidebarOpen((prev) => !prev);
   const [loading, setLoading] = useState<boolean>(false);
   const [items, setItems] = useState<FaqItem[]>([]);
   const [q, setQ] = useState<string>("");
@@ -127,9 +128,13 @@ export default function FaqPage() {
 
   return (
     <div className="min-h-screen w-full bg-gray-50 text-gray-900">
-      <Sidebar />
+      {/* Sidebar */}
+      <Sidebar sidebarOpen={sidebarOpen} />
+
+      {/* Main area */}
       <div className="lg:pl-72">
-        <Header />
+        {/* Topbar */}
+        <Header sidebarOpen={sidebarOpen} onToggleSidebar={toggleSidebar} />
         <main className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h1 className="text-xl font-bold">홈페이지 관리 &gt;&gt; FAQ 설정</h1>

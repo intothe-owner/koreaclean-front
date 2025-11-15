@@ -44,7 +44,7 @@ export default function FAQ() {
       try {
         const params = new URLSearchParams({ is_active: "1" });
         if (cat !== ALL) params.set("category", cat);
-        const res = await fetchWithAuth(`${baseUrl}/faqs?${params.toString()}`, { method: "GET" });
+        const res = await fetchWithAuth(`${baseUrl}/faq/faqs?${params.toString()}`, { method: "GET" });
         const json = await res.json();
         if (!alive) return;
 
