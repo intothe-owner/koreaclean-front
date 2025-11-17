@@ -46,7 +46,7 @@ export default function Header() {
         {/* 로고 + 데스크탑 메뉴 */}
         <div className="flex items-center gap-6">
           <div className="text-xl font-bold">
-            <Link href="/">경로당 케어</Link>
+            <Link href="/">경로당토탈케어</Link>
           </div>
 
           {/* 데스크탑: 가로 메뉴 + 호버 드롭다운 */}

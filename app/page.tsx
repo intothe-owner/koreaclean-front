@@ -1,6 +1,7 @@
 // app/page.tsx
 'use client';
 
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 
@@ -14,7 +15,8 @@ import MainBannerSwiper from '@/components/app/MainBannerSwiper';
 
 // ✅ framer-motion 추가
 import { motion } from 'framer-motion';
-
+import { useRouter } from 'next/navigation';
+const BASE_VISIT = 2000;
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
   visible: { opacity: 1, y: 0 },
@@ -26,6 +28,70 @@ const fadeIn = {
 };
 
 export default function Home() {
+  const router = useRouter();
+
+  // ✅ 방문자 수 (실제 값) & 애니메이션용 숫자
+  const [visitCount, setVisitCount] = useState<number>(0);
+  const [displayCount, setDisplayCount] = useState<number>(0);
+
+  // ✅ 카운팅 시작 여부 (섹션이 화면에 들어왔을 때 true)
+  const [counterStarted, setCounterStarted] = useState(false);
+
+  // ✅ 1) 서버에 카운트 증가 + 오늘 방문자 수 가져오기
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const path = window.location.pathname || '/';
+
+    fetch('/backend/visit/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        const count = data?.stat?.view_count ?? 0;
+        setVisitCount(count);
+      })
+      .catch(() => {
+        // 에러 시 그냥 0 유지
+      });
+  }, []);
+
+  // ✅ 2) 0 → visitCount 까지 부드러운 카운팅 애니메이션
+  // ✅ 2) 0 → (2000 + visitCount) 까지 부드러운 카운팅 애니메이션
+  useEffect(() => {
+    // 화면에 카운터 섹션이 들어오기 전에는 애니메이션 X
+    if (!counterStarted) return;
+
+    let frameId: number;
+    const duration = 1000; // 1초 동안 증가
+    const start = 0;
+    const end = BASE_VISIT + visitCount;   // ✅ 여기서 +2000 적용
+    const startTime = performance.now();
+
+    const tick = (now: number) => {
+      const progress = Math.min((now - startTime) / duration, 1);
+      const value = Math.floor(start + (end - start) * progress);
+      setDisplayCount(value);
+
+      if (progress < 1) {
+        frameId = requestAnimationFrame(tick);
+      }
+    };
+
+    if (end > 0) {
+      frameId = requestAnimationFrame(tick);
+    } else {
+      setDisplayCount(BASE_VISIT); // 이 경우는 거의 없지만, 안전하게 기본값
+    }
+
+    return () => {
+      if (frameId) cancelAnimationFrame(frameId);
+    };
+  }, [visitCount, counterStarted]);
+
+
   return (
     <div className="relative w-full min-h-screen bg-[#f9f5f2]">
       {/* 헤더 */}
@@ -47,6 +113,8 @@ export default function Home() {
           showNav
         />
       </motion.div>
+
+
 
       {/* ③ 한국클린쿱 간단 소개 섹션 (텍스트 키움 + 스크롤 애니메이션) */}
       <motion.section
@@ -115,11 +183,13 @@ export default function Home() {
                 title: '지자체 경로당 예약하기',
                 desc: '간편하게 예약을 해보세요.',
                 img: '/images/main-request.png',
+                url: '/request'
               },
               {
                 title: '청소기업 로그인',
                 desc: '다양한 혜택을 위한 로그인',
                 img: '/images/main-login.png',
+                url: '/login'
               },
             ].map((card, i, arr) => (
               <motion.div
@@ -147,6 +217,9 @@ export default function Home() {
                     className="shrink-0 h-8 w-8 rounded-lg border border-black/30 flex items-center justify-center text-lg leading-none transition-colors duration-300 hover:bg-gray-50"
                     whileHover={{ rotate: 15 }}
                     transition={{ type: 'spring', stiffness: 300, damping: 15 }}
+                    onClick={() => {
+                      router.push(card.url);
+                    }}
                   >
                     <IoMdArrowRoundForward />
                   </motion.button>
@@ -348,6 +421,40 @@ export default function Home() {
           </div>
         </div>
       </motion.section>
+      {/* ✅ 방문자 카운터 섹션 (풀 사이즈 + 큰 텍스트) */}
+      <motion.div
+        className="w-full mt-8 mb-6 bg-transparent"
+        initial={{ opacity: 0, y: 10 }}
+        whileInView={{ opacity: 1, y: 0 }}              // 👈 스크롤 시 페이드인
+        viewport={{ once: true, amount: 0.4 }}          // 👈 화면에 40% 보이면 한 번만
+        transition={{ duration: 0.5, ease: 'easeOut', delay: 0.1 }}
+        onViewportEnter={() => {
+          // 이미 시작했으면 다시 시작 안 함
+          if (!counterStarted) {
+            setCounterStarted(true);
+          }
+        }}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-8">
+          <div className="w-full rounded-3xl bg-white/90 border border-black/5 px-6 sm:px-10 py-6 sm:py-8 shadow-sm backdrop-blur flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-center sm:text-left">
+              <span className="block text-sm sm:text-base text-gray-500">
+                오늘 경로당토탈케어 방문한 사람은
+              </span>
+            </div>
+
+            <div className="flex items-baseline gap-3 sm:gap-4">
+              <span className="text-4xl sm:text-5xl font-extrabold text-gray-900 tabular-nums leading-none">
+                {displayCount.toLocaleString()}
+              </span>
+              <span className="text-lg sm:text-xl text-gray-600 font-semibold">
+                명
+              </span>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
 
       {/* 푸터 */}
       <Footer />

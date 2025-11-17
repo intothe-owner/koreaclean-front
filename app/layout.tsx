@@ -5,6 +5,7 @@ import SwBoot from "./SwBoot";
 import { fetchSiteInfoForMeta } from "@/lib/function";
 import { baseUrl } from "@/lib/variable";
 import Providers from "./providers";
+import VisitTracker from "@/components/app/VisitTracker";
 // ✅ (선택) NextAuth v5 쓰면 서버에서 세션을 미리 가져와 초기값으로 넘길 수 있음
 // import { auth } from "@/auth";
 
@@ -73,6 +74,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="ko">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <VisitTracker />
         <SwBoot />
         {/* session={session} 도입 시 위 주석 해제 */}
         <Providers>{children}</Providers>
