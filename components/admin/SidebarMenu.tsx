@@ -23,6 +23,7 @@ const sections: Section[] = [
       { label: "메인 배너", href: "/admin/site/screen" },
       { label: "요금표정보", href: "/admin/site/pricing" },
       { label: "공지사항", href: "/admin/site/notice/list" },
+      { label: "교육공지", href: "/admin/site/edu/list" },
       { label: "문의관리", href: "/admin/site/qna/list" },
       { label: "FAQ", href: "/admin/site/faq" },
     ],
