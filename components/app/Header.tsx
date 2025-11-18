@@ -57,7 +57,11 @@ export default function Header() {
                   href={m.href || '#'}
                   className="flex items-center gap-1 py-3 hover:text-black"
                 >
-                  {m.label}
+                  {
+                    m.label === '업체 등록'?
+                      session?.user?.is_company?'업체 수정':m.label
+                    :m.label
+                  }
                   {m.children && <HiChevronDown className="mt-0.5" />}
                 </Link>
 
