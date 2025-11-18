@@ -24,10 +24,11 @@ export const authOptions: NextAuthOptions = {
           }),
         });
         const data = await res.json();
-        console.log('data',data);
+
         if (!res.ok || !data?.is_success || !data?.data?.user) {
           throw new Error(data?.message || "로그인 실패");
         }
+        console.log(data.data.user);
         return {
           ...data.data.user,
           accessToken: data.data.accessToken ?? null,
@@ -48,6 +49,7 @@ export const authOptions: NextAuthOptions = {
           contact: (user as any).contact ?? null,
           phone: (user as any).phone ?? null,
           role: (user as any).role ?? null,
+          is_company:(user as any).is_company??false,
           provider: (user as any).provider ?? "local",
         };
         token.accessToken = (user as any).accessToken ?? null;

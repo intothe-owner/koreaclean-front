@@ -4,6 +4,7 @@ import { uuid } from "@/lib/uid";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export type UploadedFile = {
+  key?: string;
   id?: string | number;
   url?: string;
   name: string;
@@ -87,19 +88,25 @@ export default function FileUpload({
   isFinish,
   setIsFinish,
 }: FileUploadProps) {
-  
-  const [items, setItems] = useState<LocalFile[]>(
-    (value || []).map((v, i) => ({
-      key: `server-${i}`,
-      name: v.name,
-      size: v.size,
-      type: v.type,
-      previewUrl: v.url,
-      progress: 100,
-      status: "done",
-      server: v,
-    }))
+  // ✅ UploadedFile → LocalFile 변환 헬퍼
+  const mapUploadedToLocal = React.useCallback(
+    (list: UploadedFile[] = []): LocalFile[] =>
+      (list || []).map((v, i) => ({
+        key: v.key ? String(v.key) : `server-${i}`,
+        name: (v as any).name || (v as any).originalName || `파일-${i + 1}`,
+        size: v.size ?? 0,
+        type: (v as any).mimetype || (v as any).type || "",
+        previewUrl: (v as any).url,
+        progress: 100,
+        status: "done" as const,
+        server: v,
+      })),
+    []
   );
+  const [items, setItems] = useState<LocalFile[]>(() => mapUploadedToLocal(value));
+  useEffect(() => {
+    setItems(mapUploadedToLocal(value));
+  }, [value, mapUploadedToLocal]);
 
   const dragRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null); // ✅ 숨긴 input 참조

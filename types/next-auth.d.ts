@@ -12,6 +12,7 @@ declare module "next-auth" {
       phone?: string | null;
       role?: "SUPER" | "ADMIN" | "CLIENT" | "COMPANY" | string | null;
       provider?: string | null;
+      is_company?:boolean | false;
     };
     accessToken?: string | null;
     refreshToken?: string | null;
