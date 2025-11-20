@@ -54,7 +54,7 @@ const nextConfig: NextConfig = {
    * 배포 시에는 .env에 BACKEND_ORIGIN을 넣어 쓰세요.
    */
   async rewrites() {
-    const backend = process.env.BACKEND_ORIGIN; // 예: http://127.0.0.1:4500 (개발용)
+    const backend = 'http://back.koreacleancoop.kr'; // 예: http://127.0.0.1:4500 (개발용)
     if (!backend) return [];
 
     return [
