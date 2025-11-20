@@ -56,11 +56,11 @@ const nextConfig: NextConfig = {
   async rewrites() {
 
     return [
-      { source: "/backend/:path*", destination: `${backend}/:path*` },
+      { source: "/backend/:path*", destination: `http://back.koreacleancoop.kr/:path*` },
       // Socket.IO(개발용) – 운영은 Nginx에서 처리 권장
-      { source: "/socket.io", destination: `${backend}/socket.io` },
-      { source: "/socket.io/", destination: `${backend}/socket.io/` },
-      { source: "/socket.io/:path*", destination: `${backend}/socket.io/:path*` },
+      { source: "/socket.io", destination: `http://back.koreacleancoop.kr/socket.io` },
+      { source: "/socket.io/", destination: `http://back.koreacleancoop.kr/socket.io/` },
+      { source: "/socket.io/:path*", destination: `http://back.koreacleancoop.kr/socket.io/:path*` },
     ];
   },
 };
