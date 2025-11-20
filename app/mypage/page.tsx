@@ -34,9 +34,9 @@ const ORG_MENUS: MenuItem[] = [
   { label: '내 신청현황', href: '/mypage/requests', icon: ClipboardList, desc: '접수·진행·완료 상태 확인' },
   { label: '새 예약 만들기', href: '/request', icon: Building2, desc: '청소/방역 예약 신청' },
   { label: '담당자 연락처', href: '/mypage/contacts', icon: Phone, desc: '지점/담당자 연락' },
-  { label: 'A/S 요청', href: '/mypage/as', icon: Wrench, desc: '완료 후 하자 접수' },
-  { label: '서비스 평가하기', href: '/mypage/review', icon: Star, desc: '만족도/의견 제출' },
-  { label: '결과서 다운로드', href: '/mypage/reports', icon: FileDown, desc: '작업결과서/영수증' },
+  // { label: 'A/S 요청', href: '/mypage/as', icon: Wrench, desc: '완료 후 하자 접수' },
+  // { label: '서비스 평가하기', href: '/mypage/review', icon: Star, desc: '만족도/의견 제출' },
+  // { label: '결과서 다운로드', href: '/mypage/reports', icon: FileDown, desc: '작업결과서/영수증' },
 ];
 
 const COOP_MENUS: MenuItem[] = [
