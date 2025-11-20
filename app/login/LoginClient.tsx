@@ -119,17 +119,9 @@ export default function LoginClient({ redirect = '/' }: { redirect?: string }) {
           </div>
 
           <div className="flex items-center justify-between">
-            <label className="inline-flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="h-4 w-4"
-              />
-              자동 로그인
-            </label>
+            
             <Link href="/forgot" className="text-sm text-blue-600 hover:underline">
-              비밀번호 찾기
+              아이디/비밀번호 찾기
             </Link>
           </div>
 
