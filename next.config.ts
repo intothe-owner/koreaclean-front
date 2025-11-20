@@ -54,15 +54,13 @@ const nextConfig: NextConfig = {
    * 배포 시에는 .env에 BACKEND_ORIGIN을 넣어 쓰세요.
    */
   async rewrites() {
-    const backend = process.env.BACKEND_ORIGIN; // 예: http://127.0.0.1:4500 (개발용)
-    if (!backend) return [];
 
     return [
-      { source: "/backend/:path*", destination: `${backend}/:path*` },
+      { source: "/backend/:path*", destination: `http://back.koreacleancoop.kr/:path*` },
       // Socket.IO(개발용) – 운영은 Nginx에서 처리 권장
-      { source: "/socket.io", destination: `${backend}/socket.io` },
-      { source: "/socket.io/", destination: `${backend}/socket.io/` },
-      { source: "/socket.io/:path*", destination: `${backend}/socket.io/:path*` },
+      { source: "/socket.io", destination: `http://back.koreacleancoop.kr/socket.io` },
+      { source: "/socket.io/", destination: `http://back.koreacleancoop.kr/socket.io/` },
+      { source: "/socket.io/:path*", destination: `http://back.koreacleancoop.kr/socket.io/:path*` },
     ];
   },
 };
