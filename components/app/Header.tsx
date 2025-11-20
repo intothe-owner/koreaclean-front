@@ -192,7 +192,7 @@ export default function Header() {
               })}
 
               {/* 모바일 하단: 인증 영역 */}
-              <div className="pt-4 border-t border-gray-200 mt-4">
+              <div className="pt-4 border-t border-gray-200 mt-4 overflow-y">
                 {isAuthed ? (
                   <div className="flex flex-col gap-2">
                     {isClientOrCompany && (
@@ -213,6 +213,13 @@ export default function Header() {
                         관리자모드
                       </Link>
                     )}
+                    <Link
+                        href="/mypage"
+                        className="block py-3 text-[16px] font-medium text-gray-700"
+                        onClick={() => setMobileOpen(false)}
+                      >
+                        마이페이지
+                      </Link>
                     <button
                       className="block text-left py-3 text-[16px] font-medium text-gray-700"
                       onClick={() => { setMobileOpen(false); handleLogout(); }}
