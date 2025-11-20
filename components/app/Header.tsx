@@ -8,9 +8,11 @@ import { useRouter } from 'next/navigation';
 import { HiOutlineMenu, HiOutlineX, HiChevronDown } from 'react-icons/hi';
 import { useSession, signOut } from 'next-auth/react';
 import { fetchWithAuth } from '@/lib/fetchWitgAuth';
+import useAutoLoginCheck from '@/hooks/useAutoLoginCheck';
 
 export default function Header() {
   const router = useRouter();
+    const { loading, authed, method} = useAutoLoginCheck();
   const { data: session, status } = useSession();
   const isAuthed = status === 'authenticated';
   const user = session?.user;
