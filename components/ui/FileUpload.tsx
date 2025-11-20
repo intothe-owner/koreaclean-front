@@ -35,8 +35,8 @@ export interface FileUploadProps {
   maxSizeMB?: number;
   multiple?: boolean;
   label?: string;
-  isFinish?:boolean;
-  setIsFinish?:()=>void
+  isFinish?: boolean;
+  setIsFinish?: () => void;
 }
 
 async function uploadWithProgress(
@@ -103,9 +103,17 @@ export default function FileUpload({
       })),
     []
   );
+
+  // ✅ 초기값만 value에서 한 번 가져옴
   const [items, setItems] = useState<LocalFile[]>(() => mapUploadedToLocal(value));
+
+  // ✅ 외부 value와 동기화는 "items가 비어 있을 때만" (예: 수정모드에서 기존 첨부 주입)
   useEffect(() => {
-    setItems(mapUploadedToLocal(value));
+    if (!value || value.length === 0) return;
+    setItems((prev) => {
+      if (prev.length > 0) return prev;        // 이미 로컬에 있으면 덮어쓰지 않음
+      return mapUploadedToLocal(value);        // 처음 로딩할 때만 반영
+    });
   }, [value, mapUploadedToLocal]);
 
   const dragRef = useRef<HTMLDivElement>(null);
@@ -174,7 +182,9 @@ export default function FileUpload({
         );
         try {
           const result = await uploadWithProgress(uploadEndpoint, it.file, (p) => {
-            setItems((prev) => prev.map((p2) => (p2.key === it.key ? { ...p2, progress: p } : p2)));
+            setItems((prev) =>
+              prev.map((p2) => (p2.key === it.key ? { ...p2, progress: p } : p2))
+            );
           });
           const first = result?.[0];
           setItems((prev) =>
@@ -207,7 +217,7 @@ export default function FileUpload({
         } finally {
           setItems((prev) => {
             const cloned = [...prev];
-            emit(cloned);
+            emit(cloned); // ✅ done 파일들을 부모로 전달 (여러 개 누적 가능)
             return cloned;
           });
         }
@@ -278,7 +288,7 @@ export default function FileUpload({
       openFileDialog();
     }
   };
- 
+
   return (
     <div>
       <label className="mb-1 block text-sm font-medium text-neutral-700">{label}</label>
@@ -289,10 +299,10 @@ export default function FileUpload({
         onDrop={onDrop}
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
-        onClick={openFileDialog}                // ✅ 클릭으로 열기
-        onKeyDown={onKeyDownDropzone}           // ✅ Enter/Space 접근성
-        role="button"                            // 접근성
-        tabIndex={0}                             // 포커스 가능
+        onClick={openFileDialog} // ✅ 클릭으로 열기
+        onKeyDown={onKeyDownDropzone} // ✅ Enter/Space 접근성
+        role="button" // 접근성
+        tabIndex={0} // 포커스 가능
         className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-neutral-300 bg-neutral-50 px-4 py-8 text-center cursor-pointer select-none"
         aria-label="파일 업로드 드롭존"
       >
@@ -303,7 +313,7 @@ export default function FileUpload({
 
         {/* 숨긴 input */}
         <input
-          ref={fileInputRef}                     // ✅ ref 연결
+          ref={fileInputRef} // ✅ ref 연결
           type="file"
           accept={accept}
           multiple={multiple}
