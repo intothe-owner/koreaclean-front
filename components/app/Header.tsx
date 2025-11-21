@@ -138,7 +138,7 @@ export default function Header() {
       {/* 모바일 오버레이 */}
       {mobileOpen && (
         <div className="fixed inset-0 z-[60] bg-white/85 backdrop-blur-md">
-          <div className="mx-auto max-w-7xl px-4 py-3" style={{ backgroundColor: '#fff', overflowY: 'auto' }}>
+          <div className="mx-auto   max-w-7xl px-4 py-3" style={{ backgroundColor: '#fff', overflowY: 'auto',height:'100vh'}}>
             <div className="flex items-center justify-between">
               <div className="text-xl font-bold">경로당 케어</div>
               <button
