@@ -140,7 +140,7 @@ export function BulkSeniorUploadModal({
     if (!open) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-60 flex items-center justify-center">
             <div className="absolute inset-0 bg-black/40" onClick={onClose} aria-hidden />
             <div className="relative z-10 w-full max-w-3xl rounded-2xl bg-white p-5 shadow-xl">
                 {/* 헤더 */}
