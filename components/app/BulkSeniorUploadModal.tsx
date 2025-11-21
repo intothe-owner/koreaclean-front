@@ -1,5 +1,6 @@
 // BulkSeniorUploadModal.tsx (프리뷰 테이블 부분만 변경, 전체 컴포넌트 붙여써도 OK)
 import { fetchWithAuth } from "@/lib/fetchWitgAuth";
+import { baseUrl } from "@/lib/variable";
 import React, { ChangeEvent, DragEvent, useCallback, useMemo, useState } from "react";
 import Swal from "sweetalert2";
 
@@ -15,9 +16,9 @@ type EnrichedItem = ParsedItem & { lat?: number | null; lng?: number | null; _re
 export function BulkSeniorUploadModal({
     open,
     onClose,
-    parseEndpoint = "/backend/senior/excel/upload",
-    geocodeEndpoint = "/backend/geocode/bulk",
-    saveEndpoint = "/backend/senior/save-bulk",   // ✅ 저장 엔드포인트 추가
+    parseEndpoint = `${baseUrl}/senior/excel/upload`,
+    geocodeEndpoint = `${baseUrl}/geocode/bulk`,
+    saveEndpoint = `${baseUrl}/senior/save-bulk`,   // ✅ 저장 엔드포인트 추가
     onConfirm,
     refetch,
 }: {
