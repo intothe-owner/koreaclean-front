@@ -140,7 +140,7 @@ export default function Header() {
         <div className="fixed inset-0 z-[60] bg-white/85 backdrop-blur-md">
           <div className="mx-auto   max-w-7xl px-4 py-3" style={{ backgroundColor: '#fff', overflowY: 'auto',height:'100vh'}}>
             <div className="flex items-center justify-between">
-              <div className="text-xl font-bold">경로당 케어</div>
+              <div className="text-xl font-bold">경로당 토탈 케어</div>
               <button
                 className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-gray-300"
                 onClick={() => setMobileOpen(false)}
