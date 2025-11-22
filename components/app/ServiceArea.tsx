@@ -250,8 +250,8 @@ export default function ServiceArea() {
         q.length === 0
           ? true
           : searchBy === 'name'
-          ? c.name.toLowerCase().includes(q)
-          : (c.ceo || '').toLowerCase().includes(q);
+            ? c.name.toLowerCase().includes(q)
+            : (c.ceo || '').toLowerCase().includes(q);
 
       return regionOK && textOK;
     });
@@ -272,23 +272,32 @@ export default function ServiceArea() {
     <div className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
       <div className="mb-3 font-semibold">주요 서비스 지역</div>
 
-      <AssRegionMultiSelect
-        label="지역 선택"
-        value={regions}
-        onChange={setRegions}
-        onApply={setRegions}
-        className="mb-4"
-      />
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <div className="flex-1 min-w-[260px]">
+          <AssRegionMultiSelect
+            label="지역 선택"
+            value={regions}
+            onChange={setRegions}
+            onApply={setRegions}
+          />
+        </div>
 
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        <button onClick={reset} className="rounded-md border border-neutral-300 px-3 py-1 text-sm hover:bg-neutral-50">
+        <button
+          onClick={reset}
+          className="shrink-0 rounded-md border border-neutral-300 px-3 py-2 mt-4 text-sm hover:bg-neutral-50"
+        >
           초기화
         </button>
 
         {regions.length > 0 && (
-          <span className="text-sm text-neutral-600">{regions.length}개 지역 선택됨</span>
+          <span className="text-sm text-neutral-600">
+            {regions.length}개 지역 선택됨
+          </span>
         )}
+      </div>
 
+      {/* 선택된 태그들은 아래 줄에 표시 */}
+      <div className="mt-1 flex flex-wrap items-center gap-2">
         {regions.map((k) => {
           const { sido, gugun } = splitKey(k);
           return (

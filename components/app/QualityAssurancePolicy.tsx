@@ -112,13 +112,13 @@ export default function QualityAssurancePolicy({ title = '품질 보증 정책',
 </div>
 
 
-      <div className="mt-6 rounded-2xl border border-neutral-200 bg-white p-5 flex items-center justify-between">
+      {/* <div className="mt-6 rounded-2xl border border-neutral-200 bg-white p-5 flex items-center justify-between">
         <div className="flex items-center gap-2 text-sm text-neutral-700"><FileText className="w-4 h-4"/> 품질 보증 약관 (PDF) / 체크리스트 (XLSX)</div>
         <div className="flex gap-2">
           <button className="rounded-xl bg-white border border-neutral-300 text-neutral-800 px-4 py-2 text-sm font-semibold hover:bg-neutral-50">약관 보기</button>
           <button className="rounded-xl bg-neutral-900 text-white px-4 py-2 text-sm font-semibold hover:bg-neutral-800">체크리스트 다운</button>
         </div>
-      </div>
+      </div> */}
     </section>
   );
 }

@@ -22,7 +22,7 @@ export default function ContactLocation() {
           icon={<Phone className="w-5 h-5" />}
           title="대표 전화"
           lines={[data?.tel??'', "평일 09:00~17:00"]}
-          copyText="02-000-0000"
+          copyText={data?.tel??'01042421950'}
         />
         {
           data?.emailPublic?
@@ -35,7 +35,7 @@ export default function ContactLocation() {
               icon={<PrinterCheck className="w-5 h-5" />}
               title="팩스"
               lines={[data?.fax??'', "문의 24시간 접수"]}
-              copyText=""
+              copyText={data?.fax??'01000000000'}
             />
         }
         

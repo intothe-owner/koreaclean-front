@@ -16,7 +16,6 @@ export default function Clean() {
         { label: '경로당 청소 서비스', href: '/service/clean' },
         { label: '서비스 절차 안내', href: '/service/step' },
         { label: '요금표', href: '/service/pricing' },
-        { label: '서비스 지역', href: '/service/area' },
         { label: '이용 안내', href: '/service/guide' },
         { label: '품질 보증 정책', href: '/service/quality' },
     ];

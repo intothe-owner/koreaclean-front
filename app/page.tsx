@@ -153,6 +153,9 @@ export default function Home() {
 
               <Button
                 className="mt-6 rounded-lg bg-white border border-gray-400 text-base text-black px-6 py-2.5 hover:bg-gray-100"
+                onClick={()=>{
+                  router.push('/home/intro');
+                }}
               >
                 더 알아보기
               </Button>

@@ -86,11 +86,11 @@ export default function ServiceCategories() {
                   ))}
                 </ul>
 
-                <div className="mt-5">
+                {/* <div className="mt-5">
                   <Button className="w-full">
                     <Link href={href}>자세히 보기</Link>
                   </Button>
-                </div>
+                </div> */}
               </div>
             </div>
           ))}
