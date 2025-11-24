@@ -2,6 +2,7 @@
 "use client";
 
 import { fetchWithAuth } from "@/lib/fetchWitgAuth";
+import { baseUrl } from "@/lib/variable";
 import { useQuery, keepPreviousData } from "@tanstack/react-query"; // ⬅️ 헬퍼 임포트 추가
 
 export type Role = "SUPER" | "ADMIN" | "CLIENT" | "COMPANY";
@@ -44,7 +45,7 @@ export type UserListResponse = {
 };
 
 async function fetchUserList(params: UserListParams): Promise<UserListResponse> {
-  const url = new URL("/backend/users/list", window.location.origin);
+  const url = new URL(`${baseUrl}/users/list`, window.location.origin);
   Object.entries({
     q: params.q ?? "",
     key: params.key ?? "email",
@@ -77,7 +78,7 @@ export function useUserList(params: UserListParams) {
   return useQuery({
     queryKey: ["users", params],
     queryFn: () => fetchUserList(params),
-   placeholderData: keepPreviousData,   
+    placeholderData: keepPreviousData,   
     staleTime: 10_000,          // 10s
   });
 }
