@@ -32,7 +32,7 @@ export default function ServiceOverviewIntro() {
             있도록 설계했습니다.
           </p>
           <div className="flex flex-wrap gap-3 pt-2">
-            <span className="inline-flex items-center gap-2 rounded-full bg-neutral-900 text-white text-xs md:text-sm px-4 py-2">
+            <span className="inline-flex items-center gap-2 rounded-full bg-white border border-neutral-300 text-neutral-700 text-xs md:text-sm px-4 py-2">
               <Sparkles className="w-4 h-4" /> 경로당 특화 표준 프로세스
             </span>
             <span className="inline-flex items-center gap-2 rounded-full bg-white border border-neutral-300 text-neutral-700 text-xs md:text-sm px-4 py-2">
@@ -137,7 +137,7 @@ export default function ServiceOverviewIntro() {
         </div>
         <div className="flex gap-3">
           <button 
-            className="rounded-xl bg-neutral-900 text-white px-5 py-3 text-sm font-semibold hover:bg-neutral-800"
+            className="rounded-xl bg-white border border-neutral-300 text-neutral-800 px-5 py-3 text-sm font-semibold hover:bg-neutral-50"
             onClick={()=>{router.push('/request')}}
             >
             지자체 경로당 예약하기

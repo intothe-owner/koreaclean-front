@@ -13,7 +13,7 @@ export default function ContactLocation() {
       {/* 1) 타이틀 & 리드 */}
       <section className="rounded-2xl border border-neutral-200 bg-white p-6">
         <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-neutral-900">연락처 및 위치</h2>
-        <p className="text-neutral-600 mt-1">본부 및 지사 연락처, 운영 시간, 방문/우편 주소를 한눈에 확인하세요.</p>
+        <p className="text-neutral-600 mt-1">본사 및 지사 연락처, 운영 시간, 방문/우편 주소를 한눈에 확인하세요.</p>
       </section>
 
       {/* 2) 연락 카드 */}
@@ -52,7 +52,7 @@ export default function ContactLocation() {
           <div className="flex items-start gap-3">
             <MapPin className="w-5 h-5 text-neutral-600 mt-0.5" />
             <div>
-              <div className="font-semibold text-neutral-900">본부 주소</div>
+              <div className="font-semibold text-neutral-900">본사 주소</div>
               <p className="text-sm text-neutral-600 mt-1">{data?.address??''} {data?.address_detail??''}</p>
               
             </div>
