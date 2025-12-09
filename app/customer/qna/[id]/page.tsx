@@ -28,7 +28,7 @@ type QnaDetail = {
   title: string;
   category: QnaCategory;
   status: QnaStatus;
-  content: string;          // 서버에서 mergedContent로 저장했던 본문
+  merged_content: string;          // 서버에서 mergedContent로 저장했던 본문
   files: UploadedFile[];    // JSON 컬럼
   comment_count: number;
   createdAt: string;
@@ -106,6 +106,7 @@ export default function QnaDetailPage() {
         throw new Error(t || `load failed (${res.status})`);
       }
       const json = await res.json();
+      console.log(json);
       setItem(json?.item ?? null);
       setComments(Array.isArray(json?.comments) ? json.comments : []);
     } catch (e: any) {
@@ -317,7 +318,7 @@ export default function QnaDetailPage() {
                   <div className="text-sm text-neutral-500">불러오는 중…</div>
                 ) : item ? (
                   <pre className="whitespace-pre-wrap text-[15px] leading-6 text-neutral-800">
-                    {item.content}
+                    {item.merged_content}
                   </pre>
                 ) : (
                   <div className="text-sm text-neutral-500">데이터가 없습니다.</div>

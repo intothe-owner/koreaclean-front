@@ -6,11 +6,12 @@
 import Header from '@/components/app/Header';
 import Footer from '@/components/app/Footer';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 
 
 
 export default function ThanksPage() {
-
+    const { data: session, status } = useSession();
     return (
         <div className="relative w-full min-h-screen bg-[#f9f5f2]">
             <Header />
@@ -47,12 +48,22 @@ export default function ThanksPage() {
                                 >
                                     문의하기
                                 </Link>
-                                <Link
+                                {
+                                    session?.user?
+                                    <Link
                                     href="/customer/qna/list"
                                     className="inline-flex items-center justify-center rounded-xl bg-black px-4 py-2 text-sm text-white hover:opacity-90"
                                 >
                                     내 문의 보기
+                                </Link>:
+                                <Link
+                                    href="/"
+                                    className="inline-flex items-center justify-center rounded-xl bg-black px-4 py-2 text-sm text-white hover:opacity-90"
+                                >
+                                    메인으로 가기
                                 </Link>
+                                }
+                                
                             </div>
 
                             

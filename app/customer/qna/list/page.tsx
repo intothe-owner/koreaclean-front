@@ -60,7 +60,7 @@ export default function QnaPage() {
       setErr('');
       const res = await fetchWithAuth('/backend/qna/list', {
         method: 'GET',
-       
+
         credentials: 'include',
       });
       if (!res.ok) {
@@ -85,14 +85,14 @@ export default function QnaPage() {
     <div className="relative w-full min-h-screen bg-[#f9f5f2]">
       <Header />
       <MainBannerSwiper
-                          src="/backend/banners/main-banners"
-                          height={560}
-                          rounded="rounded-3xl"
-                          autoplayDelayMs={5000}
-                          loop
-                          showDots
-                          showNav
-                        />
+        src="/backend/banners/main-banners"
+        height={560}
+        rounded="rounded-3xl"
+        autoplayDelayMs={5000}
+        loop
+        showDots
+        showNav
+      />
 
       {/* 탭 */}
       <section className="relative z-10 bg-[#f9f5f2]">
@@ -107,40 +107,40 @@ export default function QnaPage() {
           <div className="mx-auto w-full max-w-4xl">
             <div className="rounded-2xl bg-white p-5 md:p-6 shadow-sm border border-black/10">
               <div className="mb-4 flex items-center justify-between">
-  <h1 className="text-xl font-semibold text-gray-900">내 문의 목록</h1>
+                <h1 className="text-xl font-semibold text-gray-900">내 문의 목록</h1>
 
-  {/* 데스크탑용 버튼 */}
-  <div className="hidden md:flex items-center gap-2">
-    <Link
-      href="/customer/qna/"
-      className="inline-flex h-9 items-center rounded-lg border border-gray-300 bg-white px-3 text-sm hover:bg-gray-50"
-    >
-      새 문의 작성
-    </Link>
-    <button
-      onClick={load}
-      className="inline-flex h-9 items-center rounded-lg border border-gray-300 bg-white px-3 text-sm hover:bg-gray-50"
-    >
-      새로고침
-    </button>
-  </div>
-</div>
+                {/* 데스크탑용 버튼 */}
+                <div className="hidden md:flex items-center gap-2">
+                  <Link
+                    href="/customer/qna/"
+                    className="inline-flex h-9 items-center rounded-lg border border-gray-300 bg-white px-3 text-sm hover:bg-gray-50"
+                  >
+                    새 문의 작성
+                  </Link>
+                  <button
+                    onClick={load}
+                    className="inline-flex h-9 items-center rounded-lg border border-gray-300 bg-white px-3 text-sm hover:bg-gray-50"
+                  >
+                    새로고침
+                  </button>
+                </div>
+              </div>
 
-{/* 모바일용 버튼(큰 터치 영역, 2열) */}
-<div className="md:hidden grid grid-cols-2 gap-2 mb-4">
-  <Link
-    href="/customer/qna/"
-    className="h-11 rounded-xl border border-gray-300 bg-white px-4 text-sm font-medium flex items-center justify-center active:scale-[0.99]"
-  >
-    새 문의 작성
-  </Link>
-  <button
-    onClick={load}
-    className="h-11 rounded-xl border border-gray-300 bg-white px-4 text-sm font-medium flex items-center justify-center hover:bg-gray-50 active:scale-[0.99]"
-  >
-    새로고침
-  </button>
-</div>
+              {/* 모바일용 버튼(큰 터치 영역, 2열) */}
+              <div className="md:hidden grid grid-cols-2 gap-2 mb-4">
+                <Link
+                  href="/customer/qna/"
+                  className="h-11 rounded-xl border border-gray-300 bg-white px-4 text-sm font-medium flex items-center justify-center active:scale-[0.99]"
+                >
+                  새 문의 작성
+                </Link>
+                <button
+                  onClick={load}
+                  className="h-11 rounded-xl border border-gray-300 bg-white px-4 text-sm font-medium flex items-center justify-center hover:bg-gray-50 active:scale-[0.99]"
+                >
+                  새로고침
+                </button>
+              </div>
 
               <div className="rounded-xl border border-neutral-200 overflow-hidden">
                 <div className="flex items-center justify-between border-b p-3 text-sm">

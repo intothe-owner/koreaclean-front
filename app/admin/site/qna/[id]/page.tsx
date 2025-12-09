@@ -25,7 +25,7 @@ type AdminQnaDetail = {
     title: string;
     category: QnaCategory;
     status: QnaStatus;
-    content: string;
+    merged_content: string;
     files: UploadedFile[]; // JSON
     comment_count: number;
     createdAt: string;
@@ -295,7 +295,7 @@ export default function AdminQnaDetailPage() {
                             ) : loading ? (
                                 <div className="text-sm text-neutral-500">불러오는 중…</div>
                             ) : item ? (
-                                <pre className="whitespace-pre-wrap text-[15px] leading-6 text-neutral-800">{item.content}</pre>
+                                <pre className="whitespace-pre-wrap text-[15px] leading-6 text-neutral-800">{item.merged_content}</pre>
                             ) : (
                                 <div className="text-sm text-neutral-500">데이터가 없습니다.</div>
                             )}
