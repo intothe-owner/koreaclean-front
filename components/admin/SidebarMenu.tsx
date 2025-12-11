@@ -25,6 +25,7 @@ const sections: Section[] = [
       { label: "공지사항", href: "/admin/site/notice/list" },
       { label: "교육공지", href: "/admin/site/edu/list" },
       { label: "문의관리", href: "/admin/site/qna/list" },
+      { label: "자료실", href: "/admin/site/download/list" },
       { label: "FAQ", href: "/admin/site/faq" },
     ],
   },

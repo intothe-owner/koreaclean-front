@@ -8,192 +8,199 @@ import TabsBar, { TabItem } from '@/components/app/TabMenu';
 import { useEffect, useMemo, useState } from 'react';
 
 import HeroCard from '@/components/app/HeroCard';
-import { NoticeBoard } from '@/components/app/customer/NoticeBoard';
+import { useRouter } from 'next/navigation';
+import { baseUrl } from '@/lib/variable';
 
-// ====== 타입 & 샘플 데이터 ======
-type DownloadFile = { name: string; type: 'HWP' | 'PDF'; url: string; sizeKB?: number };
-type DownloadItem = { id: number; title: string; files: DownloadFile[]; count: number };
+// ====== 타입 정의 ======
+type DownloadItem = {
+  id: number;
+  title: string;
+  views?: number;
+  createdAt?: string;
+};
 
-const DOWNLOADS: DownloadItem[] = [
-  {
-    id: 1,
-    title: '견적서 양식',
-    files: [
-      { name: '견적서_양식.hwp', type: 'HWP', url: '/download/forms/estimate.hwp', sizeKB: 128 },
-      { name: '견적서_양식.pdf', type: 'PDF', url: '/download/forms/estimate.pdf', sizeKB: 96 },
-    ],
-    count: 342,
-  },
-  {
-    id: 2,
-    title: '계약서 양식',
-    files: [
-      { name: '계약서_양식.hwp', type: 'HWP', url: '/download/forms/contract.hwp', sizeKB: 144 },
-      { name: '계약서_양식.pdf', type: 'PDF', url: '/download/forms/contract.pdf', sizeKB: 112 },
-    ],
-    count: 281,
-  },
-];
+type DownloadListResponse = {
+  is_success: boolean;
+  total: number;
+  items: DownloadItem[];
+  page: number;
+  page_size: number;
+};
 
-// ====== 간단 모달 컴포넌트(이 파일 내부에서만 사용) ======
-function Modal({
-  open,
-  onClose,
-  children,
-  title,
-}: {
-  open: boolean;
-  onClose: () => void;
-  children: React.ReactNode;
-  title?: string;
-}) {
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
-
-  if (!open) return null;
-  return (
-    <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4"
-      role="dialog"
-      aria-modal="true"
-    >
-      <div className="w-full max-w-md rounded-2xl bg-white shadow-lg border border-black/10">
-        <div className="flex items-center justify-between px-5 py-4 border-b">
-          <h3 className="text-base font-semibold">{title || '파일 선택'}</h3>
-          <button
-            onClick={onClose}
-            className="rounded-md border px-2.5 py-1 text-sm hover:bg-gray-50"
-            aria-label="닫기"
-          >
-            닫기
-          </button>
-        </div>
-        <div className="p-5">{children}</div>
-      </div>
-    </div>
-  );
+// 날짜 포맷 유틸
+function toDate(v?: string | Date | null) {
+  if (!v) return '-';
+  const d = typeof v === 'string' ? new Date(v) : v;
+  if (!d || isNaN(d.getTime())) return '-';
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(
+    d.getDate()
+  ).padStart(2, '0')}`;
 }
 
-// ====== 다운로드 목록 섹션(테이블 + 모바일 카드 + 모달) ======
+// ====== 자료실 목록 섹션 ======
 function DownloadListSection() {
-  const [items, setItems] = useState<DownloadItem[]>(DOWNLOADS);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [target, setTarget] = useState<DownloadItem | null>(null);
+  const router = useRouter();
+  const [items, setItems] = useState<DownloadItem[]>([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const openModal = (it: DownloadItem) => {
-    setTarget(it);
-    setModalOpen(true);
-  };
-  const closeModal = () => {
-    setModalOpen(false);
-    setTarget(null);
-  };
+  // 홈에서는 최신 5개만 노출
+  useEffect(() => {
+    let cancelled = false;
+
+    const load = async () => {
+      try {
+        setLoading(true);
+        setErrorMsg(null);
+
+        const qs = new URLSearchParams({
+          page: '1',
+          page_size: '5',
+          order_by: 'createdAt',
+          order_dir: 'DESC',
+        });
+
+        const res = await fetch(`${baseUrl}/site/download?${qs.toString()}`, {
+          method: 'GET',
+        });
+
+        if (!res.ok) {
+          const data = await res.json().catch(() => null);
+          throw new Error(data?.message || '자료실 목록을 불러오지 못했습니다.');
+        }
+
+        const data = (await res.json()) as DownloadListResponse;
+
+        if (!cancelled) {
+          setItems(data.items || []);
+          setTotal(data.total ?? 0);
+        }
+      } catch (err: any) {
+        console.error(err);
+        if (!cancelled) setErrorMsg(err.message ?? '자료실 목록을 불러오는 중 오류가 발생했습니다.');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const list = useMemo(
     () =>
-      items.map((it) => ({
+      items.map((it, idx) => ({
         ...it,
+        no: total > 0 ? total - idx : items.length - idx, // 번호 표시용 (단순 역순)
       })),
-    [items]
+    [items, total]
   );
 
-  const handleClickFile = (file: DownloadFile) => {
-    // 실제 다운로드 트래킹 필요 시 여기서 API 호출/카운트 증가 처리
-    // setItems((prev) => prev.map(it => it.id === target?.id ? {...it, count: it.count + 1} : it));
-    // 데모: 그냥 링크 이동
-    window.location.href = file.url;
-    closeModal();
-  };
+  const goMore = () => router.push('/customer/download/list');
+  const openDetail = (id: number) => router.push(`/customer/download/${id}`);
 
   return (
     <div className="rounded-2xl bg-white p-5 md:p-6 shadow-sm border border-black/10">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold text-gray-900">자료실 다운로드</h2>
+        <h2 className="text-xl font-semibold text-gray-900">자료실</h2>
+        <button
+          type="button"
+          onClick={goMore}
+          className="text-sm text-gray-600 hover:text-gray-900 underline underline-offset-4"
+        >
+          더보기
+        </button>
       </div>
+
+      {loading && (
+        <div className="mb-3 rounded-md bg-blue-50 px-3 py-2 text-sm text-blue-700">
+          자료실 목록을 불러오는 중입니다...
+        </div>
+      )}
+
+      {errorMsg && !loading && (
+        <div className="mb-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
+          {errorMsg}
+        </div>
+      )}
+
+      {!loading && !errorMsg && list.length === 0 && (
+        <div className="py-6 text-center text-sm text-gray-500">
+          등록된 자료가 없습니다.
+        </div>
+      )}
 
       {/* 데스크톱 테이블 */}
-      <div className="hidden md:block overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-left text-gray-500">
-              <th className="py-2 px-3 w-20">번호</th>
-              <th className="py-2 px-3">제목</th>
-              <th className="py-2 px-3 w-28 text-right">다운로드수</th>
-              <th className="py-2 px-3 w-32 text-center">다운로드</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y">
-            {list.map((it) => (
-              <tr key={it.id} className="hover:bg-gray-50">
-                <td className="py-3 px-3 text-gray-500">{it.id}</td>
-                <td className="py-3 px-3">{it.title}</td>
-                <td className="py-3 px-3 text-right">{it.count.toLocaleString()}</td>
-                <td className="py-3 px-3 text-center">
-                  <button
-                    onClick={() => openModal(it)}
-                    className="inline-flex h-9 items-center rounded-lg bg-gray-900 text-white px-3 text-sm hover:bg-black/90"
+      {list.length > 0 && (
+        <>
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-gray-500 border-b">
+                  <th className="py-2 px-3 w-20">번호</th>
+                  <th className="py-2 px-3">제목</th>
+                  <th className="py-2 px-3 w-32 text-center">등록일</th>
+                  <th className="py-2 px-3 w-28 text-right">조회수</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {list.map((it, idx) => (
+                  <tr
+                    key={it.id}
+                    className="hover:bg-gray-50 cursor-pointer"
+                    onClick={() => openDetail(it.id)}
                   >
-                    다운로드
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* 모바일 카드 */}
-      <div className="md:hidden space-y-3">
-        {list.map((it) => (
-          <div key={it.id} className="rounded-xl border border-gray-200 bg-white px-4 py-3">
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <div className="text-sm text-gray-500">No. {it.id}</div>
-                <div className="mt-0.5 font-medium text-gray-900">{it.title}</div>
-              </div>
-            </div>
-            <div className="mt-2 flex items-center justify-between text-xs text-gray-500">
-              <span>다운로드수 {it.count.toLocaleString()}</span>
-              <button
-                onClick={() => openModal(it)}
-                className="inline-flex h-8 items-center rounded-lg bg-gray-900 text-white px-3 text-xs hover:bg-black/90"
-              >
-                다운로드
-              </button>
-            </div>
+                    <td className="py-3 px-3 text-gray-500">
+                      {total > 0 ? total - idx : it.no}
+                    </td>
+                    <td className="py-3 px-3">
+                      <span className="text-gray-900 hover:text-blue-600 line-clamp-1">
+                        {it.title}
+                      </span>
+                    </td>
+                    <td className="py-3 px-3 text-center text-gray-500">
+                      {toDate(it.createdAt)}
+                    </td>
+                    <td className="py-3 px-3 text-right text-gray-500">
+                      {(it.views ?? 0).toLocaleString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        ))}
-      </div>
 
-      {/* 모달: 파일 선택 */}
-      <Modal open={modalOpen} onClose={closeModal} title={target ? `${target.title} 파일 선택` : '파일 선택'}>
-        {target ? (
-          <ul className="space-y-2">
-            {target.files.map((f, idx) => (
-              <li key={idx} className="flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="text-sm font-medium text-gray-900 truncate">{f.name}</div>
-                  <div className="text-xs text-gray-500">
-                    형식: {f.type} {typeof f.sizeKB === 'number' ? `· ${f.sizeKB}KB` : ''}
+          {/* 모바일 카드 */}
+          <div className="md:hidden space-y-3">
+            {list.map((it, idx) => (
+              <button
+                key={it.id}
+                type="button"
+                onClick={() => openDetail(it.id)}
+                className="w-full text-left rounded-xl border border-gray-200 bg-white px-4 py-3 hover:bg-gray-50"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="text-xs text-gray-500">
+                      No. {total > 0 ? total - idx : it.no}
+                    </div>
+                    <div className="mt-0.5 font-medium text-gray-900 line-clamp-1">
+                      {it.title}
+                    </div>
                   </div>
                 </div>
-                <button
-                  onClick={() => handleClickFile(f)}
-                  className="inline-flex h-8 items-center rounded-md border border-gray-300 bg-white px-2.5 text-xs hover:bg-gray-100"
-                >
-                  받기
-                </button>
-              </li>
+                <div className="mt-2 flex items-center justify-between text-xs text-gray-500">
+                  <span>등록일 {toDate(it.createdAt)}</span>
+                  <span>조회수 {(it.views ?? 0).toLocaleString()}</span>
+                </div>
+              </button>
             ))}
-          </ul>
-        ) : (
-          <div className="text-sm text-gray-500">선택된 항목이 없습니다.</div>
-        )}
-      </Modal>
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -203,7 +210,7 @@ export default function NoticeList() {
     { label: '공지사항', href: '/customer/notice/list' },
     { label: '자주 묻는 질문', href: '/customer/faq' },
     { label: '문의하기', href: '/customer/qna' },
-    { label: '다운로드', href: '/customer/download/list' },
+    { label: '자료실', href: '/customer/download/list' },
   ];
   const [tab, setTab] = useState<string>('reserve');
 
@@ -223,7 +230,7 @@ export default function NoticeList() {
         </div>
       </section>
 
-      {/* 다운로드 목록 섹션 (여기 꽂기) */}
+      {/* 자료실 목록 섹션 */}
       <section className="relative z-10 bg-[#f9f5f2]">
         <div className="max-w-7xl mx-auto px-6 pt-0 pb-12">
           <DownloadListSection />

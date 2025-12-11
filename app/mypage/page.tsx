@@ -42,8 +42,8 @@ const ORG_MENUS: MenuItem[] = [
 const COOP_MENUS: MenuItem[] = [
   { label: '신청 현황', href: '/mypage/jobs', icon: ClipboardList, desc: '오늘·주간 작업 확인' },
   { label: '교육 공지', href: '/partner/education', icon: Megaphone, desc: '교육 일정/자료' },
-  { label: '내 실적 보기', href: '/partner/performance', icon: LineChart, desc: '매출/평가/정산' },
-  { label: '본사 연락처', href: '/partner/contacts', icon: Headphones, desc: '본사지원/헬프데스크' },
+  // { label: '내 실적 보기', href: '/partner/performance', icon: LineChart, desc: '매출/평가/정산' },
+  // { label: '본사 연락처', href: '/partner/contacts', icon: Headphones, desc: '본사지원/헬프데스크' },
 ];
 
 // ===== API 타입 =====
